@@ -1,6 +1,113 @@
+-- Seeder by MrKMG
+-- Version 1
 
-seedsPlanted = 0
-totalNeeded = 0
+--TGM Def
+TGM = {}
+TGM.__index = TGM
+
+function TGM.init(x,y,z,d)
+    local grid = {}
+    setmetatable(grid,TGM)
+    grid.x = x or 1
+    grid.y = y or 1
+    grid.z = z or 1
+    grid.d = d or 0
+    return grid
+end
+
+function TGM:rotateRight()
+    turtle.turnRight()
+    self.d = (self.d + 1) % 4
+end
+
+function TGM:rotateLeft()
+    turtle.turnLeft()
+    self.d = (self.d - 1) % 4
+end
+
+
+function TGM:forward()
+    self.refuel()
+    turtle.foward()
+    if     self.d == 0 then self.y = self.y + 1
+    elseif self.d == 1 then self.x = self.x + 1
+    elseif self.d == 2 then self.y = self.y - 1
+    elseif self.d == 3 then self.x = self.x - 1
+    end
+end
+
+function TGM:back()
+    self.refuel()
+    turtle.back()
+    if     self.d == 0 then self.y = self.y - 1
+    elseif self.d == 1 then self.x = self.x - 1
+    elseif self.d == 2 then self.y = self.y + 1
+    elseif self.d == 3 then self.x = self.x + 1
+    end
+end
+
+function TGM:up()
+    self.refuel()
+    turtle.up()
+end
+
+function TGM:down()
+    self.refuel()
+    turtle.down()
+end
+
+function TGM:rotateTo(dir)
+    -- TODO IMPROVE THIS
+    while self.d ~= dir do
+        rotateRight()
+    end
+end
+
+function TGM:moveTo(x,y,z)
+    y = y or self.y
+    z = z or self.z
+    if self.x ~= x then
+        if self.d == 0 or self.d == 2 then rotateTo(1) end
+        while self.x < x do self.d == 3 and forward() or back() end
+        while self.x > x do self.d == 1 and forward() or back() end
+    end
+    if self.y ~= y then
+        if self.d == 1 or self.d == 3 then rotateTo(0) end
+        while self.y < y do self.d == 2 and forward() or back() end
+        while self.y > y do self.d == 0 and forward() or back() end
+    end
+end
+
+function TGM:_refuel()
+    if turtle.getFuelLevel() == 0 then
+        if turtle.getItemCount(16) == 0 then
+            return  false
+        else
+            turtle.select(16)
+            turtle.refuel(1)
+            return true
+        end
+    end
+    return true
+end
+
+function TGM:getX()
+    return self.x
+end
+
+function TGM:getY()
+    return self.y
+end
+
+function TGM:getZ()
+    return self.z
+end
+
+function TGM:getD()
+    return self.d
+end
+
+--End TGM
 
 function clearScreen()
     term.clear()
@@ -46,7 +153,7 @@ function writeBodyTotals()
 end
 
 function writeBodyProgress()
-    arcwrite(seedsPlanted, 33, 5)
+    writeNum(seedsPlanted, 33, 5)
 
     percentage = math.ceil((seedsPlanted / totalNeeded) * 100)
     writeNum(percentage, 19, 9)
@@ -55,20 +162,47 @@ function writeBodyProgress()
     percentageBar = math.floor(percentage * 0.3)
     columnVar = 4
     while percentageBar > 0 do
-        writeAt( "=", columnVar, 8 )
+        writeAt( "~", columnVar, 8 )
         percentageBar = percentageBar - 1
         columnVar = columnVar + 1
     end
 end
 
-function refuel()
-    if turtle.getFuelLevel() == 0 then
-        while turtle.getItemCount(16) == 0 do
-            print("Waiting for fuel, press enter when ready")
-            read()
+function getSeed()
+    local returnX = bot:getX()
+    local returnY = bot:getY()
+    local returnD = bot:getD()
+
+    bot.moveTo(0,1)
+    local failedToPick = true
+    while failedToPick do
+        for s = 0, 15 do
+            turtle.select( s )
+            if turtle.suckDown() and failedToPick then
+                failedToPick = false
+            end
         end
-        turtle.select( 16 )
-        turtle.refuel(1)
+        if failedToPick then
+            clearScreen()
+            print("Waiting for seeds, press enter when ready")
+            read()
+            writeBodyTemplate()
+            writeBodyTotals()
+            writeBodyProgress()
+        end
+    end
+    bot.moveTo(returnX,returnY)
+    bot.rotateTo(returnD)
+end
+
+function TGM:refuel()
+    while self._refuel() == false do
+        clearScreen()
+        print("Waiting for fuel, press enter when ready")
+        read()
+        writeBodyTemplate()
+        writeBodyTotals()
+        writeBodyProgress()
     end
 end
 
@@ -83,29 +217,37 @@ function selectSeed()
             end
         end
         if slot == 0 then
-            print("Waiting for seeds, press enter when ready")
-            read()
+            getSeed()
         end
     end
     turtle.select(slot)
 end
 
+function placeSeed()
+    bot:refuel()
+    selectSeed()
+    turtle.placeDown()
+    seedsPlanted = seedsPlanted + 1
+    writeBodyProgress()
+end
+
 function plantRow(width,spacing)
     for x = 1, width do
-        refuel()
-        turtle.forward()
+        bot:forward()
         if ( x - 1 ) % spacing == 0 then
-            selectSeed()
-            turtle.placeDown()
-            seedsPlanted = seedsPlanted + 1
-            writeBodyProgress()
+            placeSeed()
         end
     end
     for x = 1, spacing do
-        refuel()
-        turtle.back()
+        bot:back()
     end
 end
+
+bot = TGM.init(1,1,1,0)
+seedsPlanted = 0
+totalNeeded = 0
+
+-- seedCrateOffset = 0
 
 function main()
     local Args = {...}
@@ -117,24 +259,25 @@ function main()
 
     totalNeeded = length * width
 
-    for y = 1,27 do
+    writeBodyTemplate()
+    writeBodyTotals()
+
+    for y = 1,length do
         if ( y - 1 ) % == 0 then
-            turtle.turnRight()
+            bot:turnRight()
             plant()
-            turtle.turnLeft()
+            bot:turnLeft()
         end
-        refuel()
-        turtle.forward()
+        bot:forward()
     end
 
-    turtle.turnRight()
-    turtle.turnRight()
-    for i=1,27 do
-        refuel()
-        turtle.forward()
+    bot:turnRight()
+    bot:turnRight()
+    for y = 1,length do
+        bot:forward()
     end
-    turtle.turnLeft()
-    turtle.turnLeft()
+    bot:turnLeft()
+    bot:turnLeft()
 end
 
 main()
