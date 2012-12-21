@@ -1,0 +1,142 @@
+
+seedsPlanted = 0
+totalNeeded = 0
+
+function clearScreen()
+    term.clear()
+    writeAt("Seeder",5,1)
+    term.setCursorPos( 1, 3 )
+end
+
+function writeAt(string, columnVar, rowVar)
+    term.setCursorPos( columnVar, rowVar )
+    write(string)
+end
+
+function writeNum(number, columnVar, rowVar)
+    digits = math.ceil(math.log10(number))
+    if 10^digits == number then
+        digits = digits + 1
+    end
+    term.setCursorPos( columnVar, rowVar )
+    while digits > 1 do
+        digits = digits - 1
+        columnVar = columnVar - 1
+        term.setCursorPos( columnVar, rowVar )
+    end
+    write(number)
+end
+
+function writeBodyTemplate()
+    clearScreen()
+    print ( [[
+ +--------------------------------+
+ |Seeds Needed:                 0 |
+ |Seeds Planted:                0 |
+ +--------------------------------+
+ |             Status             |
+ |[                              ]|
+ |                0%              |
+ +--------------------------------+
+]] )
+end
+
+function writeBodyTotals()
+    writeNum(totalNeeded,33,4)
+end
+
+function writeBodyProgress()
+    arcwrite(seedsPlanted, 33, 5)
+
+    percentage = math.ceil((seedsPlanted / totalNeeded) * 100)
+    writeNum(percentage, 19, 9)
+
+    -- Update Percentage Bar
+    percentageBar = math.floor(percentage * 0.3)
+    columnVar = 4
+    while percentageBar > 0 do
+        writeAt( "=", columnVar, 8 )
+        percentageBar = percentageBar - 1
+        columnVar = columnVar + 1
+    end
+end
+
+function refuel()
+    if turtle.getFuelLevel() == 0 then
+        while turtle.getItemCount(16) == 0 do
+            print("Waiting for fuel, press enter when ready")
+            read()
+        end
+        turtle.select( 16 )
+        turtle.refuel(1)
+    end
+end
+
+function selectSeed()
+    local slot = 0
+    while slot == 0 do
+        for i=1,15 do
+            if slot == 0 then
+                if turtle.getItemCount(i) > 0 then
+                    slot = i
+                end
+            end
+        end
+        if slot == 0 then
+            print("Waiting for seeds, press enter when ready")
+            read()
+        end
+    end
+    turtle.select(slot)
+end
+
+function plantRow(width,spacing)
+    for x = 1, width do
+        refuel()
+        turtle.forward()
+        if ( x - 1 ) % spacing == 0 then
+            selectSeed()
+            turtle.placeDown()
+            seedsPlanted = seedsPlanted + 1
+            writeBodyProgress()
+        end
+    end
+    for x = 1, spacing do
+        refuel()
+        turtle.back()
+    end
+end
+
+function main()
+    local Args = {...}
+
+    local length = Args[0] or 20
+    local width = Args[1] or 8
+    local hSpacing = Args[2] or 1
+    local vSpacing = Artgs[3] or 1
+
+    totalNeeded = length * width
+
+    for y = 1,27 do
+        if ( y - 1 ) % == 0 then
+            turtle.turnRight()
+            plant()
+            turtle.turnLeft()
+        end
+        refuel()
+        turtle.forward()
+    end
+
+    turtle.turnRight()
+    turtle.turnRight()
+    for i=1,27 do
+        refuel()
+        turtle.forward()
+    end
+    turtle.turnLeft()
+    turtle.turnLeft()
+end
+
+main()
+
+    

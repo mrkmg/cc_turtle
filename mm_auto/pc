@@ -1,0 +1,130 @@
+
+local port = "top"
+function split(str, pat)
+   local t = {}
+   local fpat = "(.-)" .. pat
+   local last_end = 1
+   local s, e, cap = str:find(fpat, 1)
+   while s do
+      if s ~= 1 or cap ~= "" then
+         table.insert(t,cap)
+      end
+      last_end = e+1
+      s, e, cap = str:find(fpat, last_end)
+   end
+   if last_end <= #str then
+      cap = str:sub(last_end)
+      table.insert(t, cap)
+   end
+   return t
+end
+rednet.open(port)
+local MainBotID = 0
+local quarryBots = {} 
+local currentQuarry = {}
+local quarrySize = {0,0}
+function createQuarryArray (x, y) 
+    local tempArr = {}
+    for xt = 1, x, 1 do
+        tempArr[xt] = {}
+        for yt = 1, y, 1 do
+            tempArr[xt][yt] = false
+        end
+    end
+    return tempArr
+end
+function findEmptyQuarryLane (arr) 
+    for x = 1, table.getn(arr), 1 do
+        for y = 1, table.getn(arr[x]), 1 do
+            if arr[x][y] == false then return {x, y} end
+        end
+    end
+    return false;
+end
+function setWorkingOnColumn (arr, x, y, botID) 
+    arr[x][y] = botID
+end
+function waitForBotToStart () 
+    while peripheral.getType("back") ~= "turtle" do sleep(1) end
+    local bot = peripheral.wrap("back")
+    bot.turnOn()
+end
+waitForBotToStart() 
+local botServiceQueue = {}
+local currentBot = 0
+local doneFirstLane = false
+startup = false
+while true do 
+    local id, message, distance = rednet.receive()
+    local splitMessage = split(message, " ")
+    if splitMessage[1] == "CCQuarry" then
+        if splitMessage[2] == "LOCATE" then
+            rednet.send(id, "CCQuarry PING")
+            print ("LOCATED BOT")
+        elseif splitMessage[2] == "SETUP" then  
+            if MainBotID == 0 then 
+                MainBotID = id
+                print("No bots currently setup. Defaulting bot as main bot.")
+                rednet.send(id,"CCQuarry SETUP MAINBOT")
+            else 
+                print("Bot connected. Sending mainbot information")
+                rednet.send(id, "CCQuarry SETUP SLAVE")
+            end
+            quarryBots[(table.getn(quarryBots) + 1)] = id
+        elseif splitMessage[2] == "LENGTH" then
+            quarrySize[1] = splitMessage[3]
+        elseif splitMessage[2] == "WIDTH" then
+            if quarrySize[1] ~= 0 then
+                quarrySize[2] = splitMessage[3] + 0
+                currentQuarry = createQuarryArray(quarrySize[2],quarrySize[1])
+                setWorkingOnColumn(currentQuarry, 1, 1, MainBotID)
+                rednet.send(MainBotID, "CCQuarry ")
+            else 
+                print("ERROR RECIEVED WIDTH BEFORE LENGTH")
+                exit()
+            end
+        elseif splitMessage[2] == "LANE" then
+            local laneNeeded = findEmptyQuarryLane(currentQuarry)
+            if laneNeeded ~= false then
+                rednet.send(id, "CCQuarry LANE ".. laneNeeded[1] .. " " .. laneNeeded[2])
+                setWorkingOnColumn(currentQuarry, laneNeeded[1], laneNeeded[2], id)
+            else
+                rednet.send(id,"CCQuarry LANE ENDLANE")
+            end
+        elseif splitMessage[2] == "STARTUP" then
+            rednet.broadcast("CCQuarry TAKEITEMS")
+            print("SENT OUT TRIGGER TO TAKE ITEMS")
+            startup = true
+        elseif splitMessage[2] == "DONESTARTUP" then
+            startup = false
+        elseif splitMessage[2] == "TURNONBOT" then
+            waitForBotToStart()
+        elseif splitMessage[2] == "SERVICE" then
+            if currentBot == 0 and  peripheral.isPresent("back") ~= true and startup ~= true then
+                rednet.send(id,"CCQuarry SERVICE GO")
+                currentBot = id
+            elseif peripheral.getType("back") == "turtle" then
+                print(peripheral.call("back","getID"))
+                if peripheral.call("back","getID") == id then 
+                    rednet.send(id,"CCQuarry SERVICE GO")
+                    currentBot = id
+                else
+                    table.insert(botServiceQueue,id)
+                end
+            else
+                table.insert(botServiceQueue,id)
+            end
+        elseif splitMessage[2] == "DONESERVICE" then
+            print("Startup is : "..tostring(startup))
+            if  startup == false and currentBot == id then  
+                if table.getn(botServiceQueue) > 0 then
+                    rednet.send(botServiceQueue[1],"CCQuarry SERVICE GO")
+                    currentBot = botServiceQueue[1]
+                    table.remove(botServiceQueue, 1)
+                else 
+                    currentBot = 0
+                end
+            end
+        end
+    end
+end 

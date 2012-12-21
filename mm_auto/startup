@@ -1,0 +1,437 @@
+-- Custom Variables Changable.
+local port = "right"
+local timeOutOnRednet = 2
+local limitSize = 64 -- I do not reccomend changing this as its very tempermental
+local fuelSlots = {}
+
+-- DO NOT CHANGE ANYTHING BELOW
+rednet.open(port)
+
+-- These are XYZ values relative to the quarry. At default they will all be 0 as quarry is at 0,0
+local qu_x = 0
+local qu_y = 0
+local qu_z = -1
+local facing = 2
+
+-- Misc Functions 
+function checkFuel (blocksNeeded) 
+    if turtle.getFuelLevel() < blocksNeeded then
+        local moreFuel = true
+        local fuelNeeded = blocksNeeded - turtle.getFuelLevel()
+        while fuelNeeded > 0 do
+            if turtle.refuel(1) == false then 
+                print("TAKING ITEMS")
+                if takeItems("front") == false then return false end
+            end
+            fuelNeeded = blocksNeeded - turtle.getFuelLevel()
+        end
+        print("DROPPING ITEMS")
+        turtle.drop()
+        return true
+    else
+        print("HAVE ENOUGH")
+        return true
+    end
+    return false
+end
+
+function split(str, pat)
+   local t = {}
+   local fpat = "(.-)" .. pat
+   local last_end = 1
+   print(str)
+   local s, e, cap = str:find(fpat, 1)
+   while s do
+      if s ~= 1 or cap ~= "" then
+         table.insert(t,cap)
+      end
+      last_end = e+1
+      s, e, cap = str:find(fpat, last_end)
+   end
+   if last_end <= #str then
+      cap = str:sub(last_end)
+      table.insert(t, cap)
+   end
+   return t
+end
+
+local smallestDis = 0
+local mainPCIsLocatedAt = {}
+local mainBot = false
+-- Function finds and sets up with the nearest quarry
+function setupToNearestQuarry () 
+    local ownerID = 0
+    rednet.broadcast("CCQuarry LOCATE")
+    local startedTime = os.clock()
+    while (os.clock() - startedTime) <= timeOutOnRednet do
+        local id, mess, dis = rednet.receive(timeOutOnRednet)
+        if (mess == "CCQuarry PING") then
+            if ownerID == 0 or smallestDis > dis then 
+                smallestDis = dis
+                ownerID = id
+            end
+        end
+    end
+    if (smallestDis == 0) then
+        return false
+    else return ownerID end
+end
+
+function checkIfMainBotWithQuarry (qid) 
+    local setupInformation = sendAndGetResponse(qid,"SETUP","")
+    if setupInformation ~= false then
+        if setupInformation == "CCQuarry SETUP MAINBOT" then
+            return true
+        elseif setupInformation == "CCQuarry SETUP SLAVE" then
+            return false
+        end
+    else 
+        print("Quarry PC did not respond. Moving self out of way and placing other bots in inventory if any.")
+        turtle.up()     
+        turtle.digUp()
+        turtle.up()     
+        endWithError()
+    end
+end
+
+function turn(direction) 
+    if direction == "left" or direction == "right" then
+        local d = 0
+        if direction == "left" then d = 1; turtle.turnLeft() else d = -1; turtle.turnRight() end
+        facing = facing + d
+        if (facing == -1) then facing = 3 elseif (facing == 4) then facing = 0 end
+        return true
+    end
+    return false
+end
+
+-- Function turns to the specified facing location. 
+function turnToN (face) 
+    if face == facing then return true end
+    local lOrR = (facing - face + 4) % 4 
+    if lOrR > 2 then 
+        turn("left")
+    elseif lOrR < 2 then 
+        turn("right")
+    else 
+        turn("left")
+        turn("left")
+    end
+    return true
+end
+function turnTo (nesw) 
+    if nesw == "north" then
+        turnToN(0)
+    elseif nesw == "south" then 
+        turnToN(2)
+    elseif nesw == "west" then
+        turnToN(1)
+    elseif nesw == "east" then
+        turnToN(3)
+    end
+end
+function move (dir) 
+    if dir == "up" then 
+        if turtle.up() then
+            qu_y = qu_y + 1
+            return true
+        else return false end
+    elseif dir == "down" then
+        if turtle.down() then
+            qu_y = qu_y - 1
+            return true
+        else return false end
+    elseif dir == "north" or dir == "south" or dir == "west" or dir == "east" then
+        turnTo(dir)
+        local moved = turtle.forward()
+        if moved then 
+        if dir == "north" then qu_z = qu_z + 1 elseif dir == "south" then qu_z = qu_z - 1 elseif dir == "west" then qu_x = qu_x - 1 elseif dir == "east" then qu_x = qu_x + 1 end
+        return true
+        else return false end
+    end
+    return false
+end
+function moveTo (targetX, targetZ) 
+    local way = "west"
+    if targetX > qu_x then
+        way = "east"
+    end
+    while targetX ~= qu_x do move(way) end
+    way = "south"
+    if targetZ > qu_z then
+        way = "north"
+    end
+    while targetZ ~= qu_z do move(way) end
+end
+local lengthOfCurrentQuarry = 0
+local widthOfCurrentQuarry = 1
+function doMainbotFunctions(qid) 
+    -- Setting new orientation without using turn functions so we get our 0 point.
+    for side = 1, 4, 1 do
+     if turtle.detect() == false then 
+        break
+     end
+     turtle.turnLeft()
+     if side == 4 then 
+      print ("Error, you seem to have not given me anywhere to go :(")
+        endWithError()
+      end   
+    end
+    facing = 0
+    turnTo("east")
+
+    while not checkFuel((limitSize * 2) + 32) do 
+     print("Need more fuel. Add more fuel then type to continue");  
+     read()
+    end
+    
+    -- Give extra fuel just in case!
+    while move("north") do
+        lengthOfCurrentQuarry = lengthOfCurrentQuarry + 1
+        if (lengthOfCurrentQuarry >= limitSize) then 
+            break
+        end
+    end
+    sendMessage(qid, "LENGTH", lengthOfCurrentQuarry)
+    for a = 2, lengthOfCurrentQuarry, 1 do
+        move("south")
+    end 
+    while move("east") do
+        widthOfCurrentQuarry = widthOfCurrentQuarry +  1 
+        if (widthOfCurrentQuarry >= limitSize) then 
+            break
+        end
+    end
+    sendMessage(qid, "WIDTH", widthOfCurrentQuarry)
+    print("Quarry is "..lengthOfCurrentQuarry.. " long and ".. widthOfCurrentQuarry.." wide")
+    for a = 2, widthOfCurrentQuarry, 1 do
+        move("west")    
+    end 
+
+    moveTo(-1,0)
+    turnTo("south")
+    local items = checkChangedSlot({}, false)
+    while takeItems("front") do end 
+    local changedItems = checkChangedSlot(items, true)
+    moveTo(0,0)
+    turnTo("south")
+    setupNewBots(changedItems, qid)
+    move("south")
+end
+function waitForBotToMove() 
+    while turtle.detect() do sleep(1) end
+    return true
+end
+-- Function assumes  it is positioned in the correct location
+function setupNewBots (arr, qid) 
+    sendMessage(qid, "STARTUP", "")
+    for botSlot = 1, table.getn(arr), 1 do
+        turtle.select(arr[botSlot])
+        while (turtle.getItemCount(arr[botSlot]) ~= 0) do
+            turtle.place()
+            sendMessage(qid, "TURNONBOT","")
+            waitForBotToMove()
+        end
+    end
+    sendMessage(qid, "DONESTARTUP", "")
+end
+function    endWithError () os.exit() end
+
+-- Function assumes there will be a response... if not youre fucked!
+function sendAndGetResponse (recid, messageID, message) 
+    sendMessage(recid,messageID,message)
+    local startedTime = os.clock()
+    while (os.clock() - startedTime) <= timeOutOnRednet do
+        local id, mess, dis = rednet.receive(timeOutOnRednet)
+        if id == recid or recid == 0 then
+            local splitMessage = split(mess, " ")
+            if (splitMessage[1] == "CCQuarry") then
+                if (splitMessage[2] == messageID) then
+                    return mess
+                end
+            end
+        end
+    end
+    return false
+end
+function sendAndGetResponseNoTimeout (recid, messageID, message) 
+    sendMessage(recid,messageID,message)
+    while true do
+        local id, mess, dis = rednet.receive(0)
+        if id == recid or recid == 0 then
+            local splitMessage = split(mess, " ")
+            if (splitMessage[1] == "CCQuarry") then
+                if (splitMessage[2] == messageID) then
+                    return mess
+                end
+            end
+        end
+    end
+    -- I assume this will never be reached but just in case >.>
+    return false
+end
+function sendMessage (qid, messageID, message) 
+    rednet.send(qid,"CCQuarry "..messageID.." "..message)
+end
+-- Function assumes no obsticals. Checks if turtle can get to a specified location without fuel. True if needs fuel false if not
+function needFuel (currX, currZ, currY, neededX, neededZ, neededY) 
+    if currY ~= neededY then return true end
+    if (currX == neededX) and ((neededZ - currZ) == 1 or (currZ - neededZ) == 1) then
+        return false
+    elseif (currZ == neededZ) and ((neededX - currX) == 1 or (currX - neededX) == 1) then
+        return false
+    end
+    return true
+end
+local knowsWhichWayIsX = false;
+local directionXIs = 0;
+
+-- Function WILL NOT move to block. It will not use fuel and it assumes you can actually face the block without moving and still be next to it.
+function faceBlock (currX, currZ, currY, neededX, neededZ, neededY)
+    if not needFuel(currX, currZ, currY, neededX, neededZ, neededY) then
+
+    end
+end
+-- Function returns array of the slots it placed the items from or false if could not take items
+function takeItems (direction) 
+    if direction ~= "up" and direction ~= "down" and direction ~= "front" then print("Error direction "..direction.." matched no valid direction takeItems(direction)");    endWithError(); end
+    local emptySlot = getNextEmptySlot()
+    local checkArr = {}
+    if (emptySlot ~= false) then
+        turtle.select(emptySlot)
+    else
+        checkArr = checkChangedSlot({}, false)
+    end
+    local success = false
+    if direction == "up" then
+        success = turtle.suckUp()
+    elseif direction == "down" then
+        success = turtle.suckDown()
+    else
+        success = turtle.suck()
+    end
+    if success then
+        if emptySlot ~= false then return {emptySlot} 
+        else
+            return checkChangedSlot(checkArr, true)
+        end
+    else return false; end
+end
+
+-- Function gives an array of all the slots and their counts if secondCheck is false and array is just a blank array
+-- If secondCheck is true it expects the array and loops through until it finds changes. It will return an array of changed slots
+-- Useful for when you take from an inventory and it fills a slot up you can find where it put it. 
+function checkChangedSlot (array, secondCheck)
+    local newArr = {}   
+    if secondCheck == false then
+        for a = 1, 16, 1 do
+            newArr[a] = turtle.getItemCount(a)
+        end
+        return newArr 
+    else 
+        if table.getn(array) == 16 then
+            for a = 1, 16, 1 do
+                if array[a] ~= turtle.getItemCount(a) then
+                    newArr[(table.getn(newArr) + 1)] = a
+                end
+            end
+            return newArr
+        else 
+            print("Array given to checkChangedSlot is not 16 in length. Cannot continue.")
+        end
+    end
+end
+
+function getNextEmptySlot () 
+    for a = 1, 16, 1 do
+        if turtle.getItemCount(a) == 0 then
+            return a
+        end
+    end
+    return false
+end
+
+function getWorkingLane (qid) 
+    local dd = sendAndGetResponseNoTimeout(qid, "LANE","")
+    return dd
+end
+
+function requestServiceLane (qid) 
+    local canGoYet = sendAndGetResponseNoTimeout(qid, "SERVICE", "") 
+
+    if canGoYet == "CCQuarry SERVICE GO" then
+        move("up")
+        return true
+    end
+endWithError()
+end 
+
+function startDigging(qid)
+    turtle.digDown() 
+    while turtle.digDown() or move("down") do end
+    while qu_y ~= 0 do move("up") end
+end
+function makeDropAtStation (qid) 
+    moveTo(0,-1)
+    move("down")
+    turnTo("west")
+    for inv = 1, 16, 1 do
+        turtle.select(inv)
+        turtle.drop()
+    end
+    turnTo("east")
+    return true
+end
+local doneFirstLane= false
+local currentLane = {}
+local mainbot = false
+function processLane (qid) 
+    local getCurrLane = ""
+    if doneFirstLane == false and mainbot == true then getCurrLane = "CCQuarry LANE 1 1"; doneFirstLane = true else getCurrLane = getWorkingLane(qid) end
+    print(getCurrLane)
+    if getCurrLane ~= false  then
+        if getCurrLane ~= "CCQuarry LANE ENDLANE" then
+            local splitMess = split(getCurrLane, " ")
+            print(splitMess[3])
+            currentLane[1] = splitMess[3] + 0
+            currentLane[2] = splitMess[4] + 0
+            turnTo("north")
+            print("Supposed to get to ".. currentLane[1] .. " , "..currentLane[2])
+            turnTo("east")
+            checkFuel(2 + currentLane[1] + currentLane[2] + 256)
+            move("up")
+            moveTo(currentLane[1] - 1, currentLane[2] - 1)
+            move("down")
+            sendMessage(qid, "DONESERVICE", "")
+            startDigging(qid)
+            requestServiceLane(qid)
+            makeDropAtStation(qid)
+            return true
+        else
+            return false
+        end 
+    else 
+        print("Quarry did not respond in time.")
+        endWithError()
+    end
+end 
+
+
+local MasterID = setupToNearestQuarry()
+
+print("Starting Up")
+if MasterID ~= false then 
+    print("Am I Mainbot?")
+    mainbot = checkIfMainBotWithQuarry (MasterID)
+    if mainbot then doMainbotFunctions(MasterID) end
+    while processLane(MasterID) do end
+    print ("Requesting again :D!")
+    requestServiceLane(MasterID)
+    move("up")
+    moveTo(currentLane[1] - 1,currentLane[2] - 1)
+    move("up")
+    sendMessage(qid, "DONESERVICE", "")
+else 
+    print("No Quarry PC found. Please set that up first before me.")
+    endWithError()
+end
