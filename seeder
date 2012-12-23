@@ -299,13 +299,13 @@ function askNumber(question)
 
     clearScreen()
     while WidthQuestion == true do -- Width Question
-        print("Width of tunnel?")
+        print(question)
         ans = tonumber(read())
         clearScreen()
         if ans == nil then
             print( "Please answer with a number." )
         elseif ans > 0 then
-            ansQuestion = false
+            ans = false
         elseif ans == 0 then
             print( "Must be greater than 0." )
         else
