@@ -27,66 +27,139 @@ end
 
 
 function TGM:forward()
-    self.refuel()
-    turtle.foward()
-    if     self.d == 0 then self.y = self.y + 1
-    elseif self.d == 1 then self.x = self.x + 1
-    elseif self.d == 2 then self.y = self.y - 1
-    elseif self.d == 3 then self.x = self.x - 1
+    self:refuel()
+    if turtle.forward() then
+        if     self:getD() == 0 then self.y = self.y + 1
+        elseif self:getD() == 1 then self.x = self.x + 1
+        elseif self:getD() == 2 then self.y = self.y - 1
+        elseif self:getD() == 3 then self.x = self.x - 1
+        end
+    else
+        sleep(1)
     end
+    return true
 end
 
 function TGM:back()
-    self.refuel()
-    turtle.back()
-    if     self.d == 0 then self.y = self.y - 1
-    elseif self.d == 1 then self.x = self.x - 1
-    elseif self.d == 2 then self.y = self.y + 1
-    elseif self.d == 3 then self.x = self.x + 1
+    self:refuel()
+    if turtle.back() then
+        if     self:getD() == 0 then self.y = self.y - 1
+        elseif self:getD() == 1 then self.x = self.x - 1
+        elseif self:getD() == 2 then self.y = self.y + 1
+        elseif self:getD() == 3 then self.x = self.x + 1
+        end
+    else
+        sleep(1)
     end
+    return true
 end
 
 function TGM:up()
-    self.refuel()
+    self:refuel()
     turtle.up()
+    return true
 end
 
 function TGM:down()
-    self.refuel()
+    self:refuel()
     turtle.down()
+    return true
 end
 
-function TGM:rotateTo(dir)
-    -- TODO IMPROVE THIS
-    while self.d ~= dir do
-        rotateRight()
+function TGM:rotateTo(d)
+    if self.d == 0  then
+        if d == 1 then
+            self:rotateRight()
+        elseif d == 2 then
+            self:rotateRight()
+            self:rotateRight()
+        elseif d == 3 then
+            self:rotateLeft()
+        end
+    elseif self.d == 1 then
+        if d == 2 then
+            self:rotateRight()
+        elseif d == 3 then
+            self:rotateRight()
+            self:rotateRight()
+        elseif d == 0 then
+            self:rotateLeft()
+        end
+    elseif self.d == 2 then
+        if d == 3 then
+            self:rotateRight()
+        elseif d == 0 then
+            self:rotateRight()
+            self:rotateRight()
+        elseif d == 1 then
+            self:rotateLeft()
+        end
+    elseif self.d == 3  then
+        if d == 0 then
+            self:rotateRight()
+        elseif d == 1 then
+            self:rotateRight()
+            self:rotateRight()
+        elseif d == 2 then
+            self:rotateLeft()
+        end
     end
 end
 
 function TGM:moveTo(x,y,z)
-    y = y or self.y
-    z = z or self.z
-    if self.x ~= x then
-        if self.d == 0 or self.d == 2 then rotateTo(1) end
-        while self.x < x do self.d == 3 and forward() or back() end
-        while self.x > x do self.d == 1 and forward() or back() end
+    if self:getX() ~= x then
+        if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
+        while self:getX() < x do
+            sleep(0.1)
+            if self:getD() == 1 then
+                self:forward()
+            else 
+                self:back()
+            end
+        end
+        while self:getX() > x do
+            sleep(0.1)
+            if self:getD() == 1 then
+                self:back()
+            else 
+                self:forward()
+            end
+        end
     end
-    if self.y ~= y then
-        if self.d == 1 or self.d == 3 then rotateTo(0) end
-        while self.y < y do self.d == 2 and forward() or back() end
-        while self.y > y do self.d == 0 and forward() or back() end
+    if self:getY() ~= y then
+        if self:getD() == 1 or self:getD() == 3 then self:rotateTo(0) end
+        while self:getY() < y do
+            sleep(0.1)
+            if self:getD() == 0 then
+                self:forward()
+            else 
+                self:back()
+            end
+        end
+        while self:getY() > y do
+            sleep(0.1)
+            if self:getD() == 0 then
+                self:back()
+            else 
+                self:forward()
+            end
+        end
     end
 end
 
-function TGM:_refuel()
+function TGM:refuel()
     if turtle.getFuelLevel() == 0 then
-        if turtle.getItemCount(16) == 0 then
-            return  false
-        else
-            turtle.select(16)
-            turtle.refuel(1)
-            return true
+        while turtle.getItemCount(16) == 0 do
+	        clearScreen()
+	        print("Waiting for fuel, press enter when ready")
+	        read()
+	        writeBodyTemplate()
+	        writeBodyTotals()
+	        writeBodyProgress()
         end
+        turtle.select(16)
+        turtle.refuel(1)
+        return true
     end
     return true
 end
@@ -171,12 +244,13 @@ end
 function getSeed()
     local returnX = bot:getX()
     local returnY = bot:getY()
+    local returnZ = bot:getZ()
     local returnD = bot:getD()
 
-    bot.moveTo(0,1)
+    bot:moveTo(-1,1,returnZ)
     local failedToPick = true
     while failedToPick do
-        for s = 0, 15 do
+        for s = 1, 15 do
             turtle.select( s )
             if turtle.suckDown() and failedToPick then
                 failedToPick = false
@@ -191,19 +265,8 @@ function getSeed()
             writeBodyProgress()
         end
     end
-    bot.moveTo(returnX,returnY)
-    bot.rotateTo(returnD)
-end
-
-function TGM:refuel()
-    while self._refuel() == false do
-        clearScreen()
-        print("Waiting for fuel, press enter when ready")
-        read()
-        writeBodyTemplate()
-        writeBodyTotals()
-        writeBodyProgress()
-    end
+    bot:moveTo(returnX,returnY,returnZ)
+    bot:rotateTo(returnD)
 end
 
 function selectSeed()
@@ -231,55 +294,35 @@ function placeSeed()
     writeBodyProgress()
 end
 
-function plantRow(width,spacing)
-    for x = 1, width do
-        bot:forward()
-        if ( x - 1 ) % spacing == 0 then
-            placeSeed()
-        end
-    end
-    for x = 1, spacing do
-        bot:back()
-    end
-end
-
-bot = TGM.init(1,1,1,0)
+bot = TGM.init(0,1,1,0)
 seedsPlanted = 0
 totalNeeded = 0
 
 -- seedCrateOffset = 0
 
-function main()
-    local Args = {...}
+function main(Args)
 
-    local length = Args[0] or 20
-    local width = Args[1] or 8
-    local hSpacing = Args[2] or 1
-    local vSpacing = Artgs[3] or 1
+    local length = Args[1] or 20
+    local width = Args[2] or 8
+    local hSpacing = Args[3] or 1
+    local vSpacing = Args[4] or 1
 
     totalNeeded = length * width
 
     writeBodyTemplate()
     writeBodyTotals()
-
+    local x,y
     for y = 1,length do
-        if ( y - 1 ) % == 0 then
-            bot:turnRight()
-            plant()
-            bot:turnLeft()
+        for x = 1,width do
+            if ( y - 1 ) % vSpacing == 0 and (x - 1) % hSpacing then
+                bot:moveTo(x,y,bot:getZ())
+                placeSeed()
+            end
         end
-        bot:forward()
     end
 
-    bot:turnRight()
-    bot:turnRight()
-    for y = 1,length do
-        bot:forward()
-    end
-    bot:turnLeft()
-    bot:turnLeft()
+    bot:moveTo(0,1,0)
+    bot:rotateTo(0)
 end
 
-main()
-
-    
+main({...})
