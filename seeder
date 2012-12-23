@@ -294,6 +294,27 @@ function placeSeed()
     writeBodyProgress()
 end
 
+function askNumber(question)
+    local ans
+
+    clearScreen()
+    while WidthQuestion == true do -- Width Question
+        print("Width of tunnel?")
+        ans = tonumber(read())
+        clearScreen()
+        if ans == nil then
+            print( "Please answer with a number." )
+        elseif ans > 0 then
+            ansQuestion = false
+        elseif ans == 0 then
+            print( "Must be greater than 0." )
+        else
+            print( "Must be positive." )
+        end
+    end
+    return ans
+end
+
 bot = TGM.init(0,1,1,0)
 seedsPlanted = 0
 totalNeeded = 0
@@ -302,10 +323,8 @@ totalNeeded = 0
 
 function main(Args)
 
-    local length = Args[1] or 20
-    local width = Args[2] or 8
-    local hSpacing = Args[3] or 1
-    local vSpacing = Args[4] or 1
+    length = askNumber("What Length is the target area?")
+    width = askNumber("What Width is the target area?")
 
     totalNeeded = length * width
 
@@ -314,10 +333,8 @@ function main(Args)
     local x,y
     for y = 1,length do
         for x = 1,width do
-            if ( y - 1 ) % vSpacing == 0 and (x - 1) % hSpacing then
-                bot:moveTo(x,y,bot:getZ())
-                placeSeed()
-            end
+            bot:moveTo(x,y,bot:getZ())
+            placeSeed()
         end
     end
 
