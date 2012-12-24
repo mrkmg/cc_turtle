@@ -1,6 +1,8 @@
 -- Builder by MrKMG
 -- Version 1
-
+local author = "mrkmg"
+local project = "cc_turtle"
+local branch = "master"
 --TGM Def
 Dig = {}
 Dig.__index = Dig
