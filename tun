@@ -17,6 +17,7 @@ function Dig:forward()
     while turtle.detect() and count <= 256 do
         turtle.dig()
         count = count + 1
+        sleep(1)
     end
     if count == 256 then
         return false
@@ -30,6 +31,7 @@ function Dig:up()
     while turtle.detectUp() and count <= 256 do
         turtle.digUp()
         count = count + 1
+        sleep(1)
     end
     if count == 256 then
         return false
@@ -43,6 +45,7 @@ function Dig:down()
     while turtle.detectDown() and count <= 256 do
         turtle.digDown()
         count = count + 1
+        sleep(1)
     end
     if count == 256 then
         return false
