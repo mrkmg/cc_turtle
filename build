@@ -298,7 +298,7 @@ function checkAndRefillSlot(slot)
         local returnD = bot:getD()
         local box = boxes[slot]
 
-        bot:moveTo(slot,0,1)
+        bot:moveTo(box[x],box[y],box[z]+1)
         turtle.select(slot)
         while turtle.suck() == false do
             print("Please refill crate " .. slot .. "and press enter.")
@@ -347,6 +347,16 @@ function main()
 end
 
 homeLocation = { x = 1, y = 0, z = 1 }
+boxes = {}
+boxes[1] = { x = 1, y = 0, z = 0 }
+boxes[2] = { x = 3, y = 2, z = 0 }
+boxes[3] = { x = 5, y = 4, z = 0 }
+boxes[4] = { x = 1, y = 0, z = 0 }
+boxes[5] = { x = 3, y = 2, z = 0 }
+boxes[6] = { x = 5, y = 4, z = 0 }
+boxes[7] = { x = 1, y = 0, z = 0 }
+boxes[8] = { x = 3, y = 2, z = 0 }
+boxes[9] = { x = 5, y = 4, z = 0 }
 
 template = askString("What template?")
 
