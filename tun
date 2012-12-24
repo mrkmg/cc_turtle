@@ -285,9 +285,9 @@ length = askNumber("Length")
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
 
-for l=1, length
-    for h=1, height
-        for w=1, width
+for l=1, length do
+    for h=1, height do
+        for w=1, width do
             if w == 1 then
                 bot.moveTo(w,l-1,h)
                 bot.rotateTo(0)
