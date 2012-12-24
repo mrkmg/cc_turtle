@@ -117,7 +117,7 @@ end
 
 function TGM:down()
     self:refuel()
-    if turtle.down() else
+    if turtle.down() then
         self.z = self.z - 1
     else
         sleep(1)
