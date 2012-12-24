@@ -300,7 +300,7 @@ function checkAndRefillSlot(slot)
 
         bot:moveTo(box.x,box.y,box.z+1)
         turtle.select(slot)
-        while turtle.suck() == false do
+        while turtle.suckDown() == false do
             print("Please refill crate " .. slot .. " and press enter.")
             read()
         end
