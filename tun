@@ -209,12 +209,12 @@ function TGM:moveTo(x,y,z)
     end
     -- Z
     while self:getZ() < z do
-        self.up()
+        self:up()
         sleep(0.1)
     end
     while self:getZ() > z do
         sleep(0.1)
-        self.down()
+        self:down()
     end
 end
 
