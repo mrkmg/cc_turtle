@@ -319,7 +319,7 @@ while l <= length do
             if h - 1 < height then
                 dig:up()
             end
-            placeTorch()
+            placeTorch(w,l,h)
             w = w + 1
         end
         h = h + 2
