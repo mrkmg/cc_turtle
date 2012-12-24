@@ -1,0 +1,110 @@
+-- Advanced GUI by Henness, Modified by MrKMG for MrKMG
+-- Version 1.0 12/16/2012
+
+-- Config
+screenw,screenh = term.getSize()
+local author = "mrkmg"
+local project = "cc_turtle"
+local branch = "master"
+
+-- Functions
+function printReverse(str, xpos, ypos)
+    term.setCursorPos(xpos - (#str-1), ypos)
+    term.write (str)
+end
+
+function printForward(str, xpos, ypos)
+    term.setCursorPos(xpos, ypos)
+    term.write (str)
+end
+
+function printCentered(str, ypos)
+    term.setCursorPos(screenw/2 - #str/2, ypos)
+    term.write(str)
+end
+
+function printRight(str, ypos)
+    term.setCursorPos(screenw - #str, ypos)
+    term.write(str)
+end
+
+function printLeft(str, ypos)
+    term.setCursorPos(1, ypos)
+    term.write(str)
+end
+
+function drawHeader()
+    local author = "[by MrKMG]"
+    printCentered("KRun", 1)
+    printCentered(string.rep("-", screenw), 2) 
+    printCentered(string.rep("-", screenw-#author)..author, screenh)
+end
+
+function drawMain()
+    term.clear()
+    drawHeader()
+    local ypos = 3
+    for i = 1, #options do
+        printForward(options[i],3,ypos+i)
+    end
+    printLeft(">", ypos+select)
+end
+
+function getLink(file)
+    return "https://raw.github.com/" .. author .. "/" .. project .. "/" .. branch .. "/" .. file
+end
+
+function download(file)
+    print("Downloading, " .. file)
+    local data = http.get(getLink(file))
+    if data then
+        print(file .. " downloaded")
+        local file = fs.open(file,"w")
+        file.write(data.readAll())
+        file.close()
+        return true
+    end
+end
+
+function clearScreen()
+    term.clear()
+    term.setCursorPos(1,1)
+end
+
+function gui()
+    clearScreen()
+    select = 1
+
+    drawMain()
+    run = true
+    while run do
+        local id, key = os.pullEvent("key")
+        -- DOWN = 208 UP = 200 LEFT = 203 RIGHT = 205 ENTER = 28
+        if key == 200 and select > 1 then
+            select = select-1
+        elseif key == 208 and select < #options then
+            select = select+1
+        elseif key == 203 and select > 1 then
+            select = select-1
+        elseif key == 205 and select < #options then
+            select = select+1
+        elseif key == 28 then
+            if options[select] == "exit" then
+                break
+            end
+            clearScreen()
+            run = false
+            shell.run("krun "..options[select])
+            select = 1
+        end
+        drawMain()
+    end
+    clearScreen()
+end
+
+-- RUN
+if fs.exists("krun") == false then
+    download("krun")
+end
+options = {"seeder", "tun", "build", "exit"}
+gui()
