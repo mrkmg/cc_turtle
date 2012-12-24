@@ -311,7 +311,7 @@ while l <= length do
                     dig:up()
                 end
             else
-                bot:moveTo(w-1,l,h)
+                bot:moveTo(w,l,h)
                 bot:rotateTo(1)
                 dig:forward()
                 dig:down()
