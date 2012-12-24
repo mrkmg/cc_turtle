@@ -289,13 +289,13 @@ for l=1, length do
     for h=1, height do
         for w=1, width do
             if w == 1 then
-                bot.moveTo(w,l-1,h)
-                bot.rotateTo(0)
-                dig.forward()
+                bot:moveTo(w,l-1,h)
+                bot:rotateTo(0)
+                dig:forward()
             else
-                bot.moveTo(w-1,l,h)
-                bot.rotateTo(1)
-                dig.forward()
+                bot:moveTo(w-1,l,h)
+                bot:rotateTo(1)
+                dig:forward()
             end
         end
     end
