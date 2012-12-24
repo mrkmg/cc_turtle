@@ -297,10 +297,8 @@ function checkAndRefillSlot(slot)
         local returnZ = bot:getZ()
         local returnD = bot:getD()
         local box = boxes[slot]
-        print(box[x])
-        print(box[y])
-        print(box[z])
-        bot:moveTo(box[x],box[y],box[z]+1)
+
+        bot:moveTo(box.x,box.y,box.z+1)
         turtle.select(slot)
         while turtle.suck() == false do
             print("Please refill crate " .. slot .. "and press enter.")
