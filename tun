@@ -286,20 +286,44 @@ length = askNumber("Length")
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
 
-for l=1, length do
-    for h=1, height do
-        for w=1, width do
+
+local l = 1
+local h = 2
+local w = 1
+
+while l <= length do
+    while h <= height do
+        while w <= width do
             if w == 1 then
                 bot:moveTo(w,l-1,h)
                 bot:rotateTo(0)
                 dig:forward()
+                dig:down()
+                if h - 1 < height then
+                    dig:up()
+                end
+            elseif w == width then
+                bot:moveTo(w,l,h)
+                bot:rotateTo(1)
+                dig:down()
+                if h - 1 < height then
+                    dig:up()
+                end
             else
                 bot:moveTo(w-1,l,h)
                 bot:rotateTo(1)
                 dig:forward()
+                dig:down()
+                if h - 1 < height then
+                    dig:up()
+                end
             end
+            w = w + 1
         end
+        h = h + 2
     end
+    l = l + 1
 end
+
 bot:moveTo(1,0,1)
 rotateTo(0)
