@@ -305,7 +305,7 @@ function checkAndRefillSlot(slot)
             read()
         end
         bot:moveTo(returnX,returnY,returnZ)
-        bot:rotate(returnD)
+        bot:rotateTo(returnD)
     end
 end
 
