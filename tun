@@ -258,16 +258,16 @@ end
 
 function askNumber(question)
     local ans
-
+    local cont = true
     clearScreen()
-    while WidthQuestion == true do -- Width Question
+    while cont == true do -- Width Question
         print(question)
         ans = tonumber(read())
         clearScreen()
         if ans == nil then
             print( "Please answer with a number." )
         elseif ans > 0 then
-            ans = false
+            cont = false
         elseif ans == 0 then
             print( "Must be greater than 0." )
         else
