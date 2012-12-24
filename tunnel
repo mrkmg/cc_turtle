@@ -255,7 +255,7 @@ end
 
 function placeTorch(x,y,z)
     if turtle.getItemCount(15) > 0 then
-        if ( x % 5 ) == 2 and ( y % 5) == 0 and ( z ) == 2 then
+        if ( x % 5 ) == 3 and ( y % 5) == 1 and ( z ) == 2 then
             turtle.select(15)
             turtle.placeDown()
             turtle.select(1)
