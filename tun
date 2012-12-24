@@ -326,4 +326,4 @@ while l <= length do
 end
 
 bot:moveTo(1,0,1)
-rotateTo(0)
+bot:rotateTo(0)
