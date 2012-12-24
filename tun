@@ -322,6 +322,7 @@ while l <= length do
         end
         h = h + 2
     end
+    print(l)
     l = l + 1
 end
 
