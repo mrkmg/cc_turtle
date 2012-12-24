@@ -288,11 +288,12 @@ dig = Dig.init()
 
 
 local l = 1
-local h = 2
-local w = 1
-
+local w = 2
+local h = 1
 while l <= length do
+    h = 2
     while h <= height do
+        w = 1
         while w <= width do
             if w == 1 then
                 bot:moveTo(w,l-1,h)
