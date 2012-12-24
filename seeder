@@ -247,7 +247,7 @@ function getSeed()
     local returnZ = bot:getZ()
     local returnD = bot:getD()
 
-    bot:moveTo(-1,1,returnZ)
+    bot:moveTo(seedLocation[x],seedLocation[y],seedLocation[z])
     local failedToPick = true
     while failedToPick do
         for s = 1, 15 do
@@ -258,7 +258,7 @@ function getSeed()
         end
         if failedToPick then
             clearScreen()
-            print("Waiting for seeds, press enter when ready")
+            print("Waiting for seed, press enter when ready")
             read()
             writeBodyTemplate()
             writeBodyTotals()
@@ -315,14 +315,23 @@ function askNumber(question)
     return ans
 end
 
-bot = TGM.init(0,1,1,0)
+bot = TGM.init(1,0,1,0)
 seedsPlanted = 0
 totalNeeded = 0
+homeLocation = {
+    x = 1,
+    y = 0,
+    z = 1
+}
+seedLocation = {
+    x = 1,
+    y = 0,
+    z = 0
+}
 
 -- seedCrateOffset = 0
 
 function main(Args)
-
     length = askNumber("What Length is the target area?")
     width = askNumber("What Width is the target area?")
 
@@ -338,7 +347,7 @@ function main(Args)
         end
     end
 
-    bot:moveTo(0,1,0)
+    bot:moveTo(homeLocation[x],homeLocation[y],homeLocation[z])
     bot:rotateTo(0)
 end
 
