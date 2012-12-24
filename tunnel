@@ -1,0 +1,321 @@
+-- tun by MrKMG
+-- Version 1
+
+--TGM Def
+Dig = {}
+Dig.__index = Dig
+
+function Dig.init()
+    local dig = {}
+    setmetatable(dig,Dig)
+    dig.collectBlocks = true
+    return dig
+end
+
+function Dig:forward()
+    local count = 0
+    while turtle.detect() and count <= 256 do
+        turtle.dig()
+        count = count + 1
+        sleep(1)
+    end
+    if count == 256 then
+        return false
+    else
+        return true
+    end
+end
+
+function Dig:up()
+    local count = 0
+    while turtle.detectUp() and count <= 256 do
+        turtle.digUp()
+        count = count + 1
+        sleep(1)
+    end
+    if count == 256 then
+        return false
+    else
+        return true
+    end
+end
+
+function Dig:down()
+    local count = 0
+    while turtle.detectDown() and count <= 256 do
+        turtle.digDown()
+        count = count + 1
+        sleep(1)
+    end
+    if count == 256 then
+        return false
+    else
+        return true
+    end
+end
+
+--TGM Def
+TGM = {}
+TGM.__index = TGM
+
+function TGM.init(x,y,z,d)
+    local grid = {}
+    setmetatable(grid,TGM)
+    grid.x = x or 1
+    grid.y = y or 1
+    grid.z = z or 1
+    grid.d = d or 0
+    return grid
+end
+
+function TGM:rotateRight()
+    turtle.turnRight()
+    self.d = (self.d + 1) % 4
+end
+
+function TGM:rotateLeft()
+    turtle.turnLeft()
+    self.d = (self.d - 1) % 4
+end
+
+
+function TGM:forward()
+    self:refuel()
+    if turtle.forward() then
+        if     self:getD() == 0 then self.y = self.y + 1
+        elseif self:getD() == 1 then self.x = self.x + 1
+        elseif self:getD() == 2 then self.y = self.y - 1
+        elseif self:getD() == 3 then self.x = self.x - 1
+        return true
+        end
+    else
+        sleep(1)
+        return false
+    end
+end
+
+function TGM:back()
+    self:refuel()
+    if turtle.back() then
+        if     self:getD() == 0 then self.y = self.y - 1
+        elseif self:getD() == 1 then self.x = self.x - 1
+        elseif self:getD() == 2 then self.y = self.y + 1
+        elseif self:getD() == 3 then self.x = self.x + 1
+        end
+        return true
+    else
+        sleep(1)
+        return false
+    end
+end
+
+function TGM:up()
+    self:refuel()
+    if turtle.up() then
+        self.z = self.z + 1
+        return true
+    else
+        return false
+    end
+end
+
+function TGM:down()
+    self:refuel()
+    if turtle.down() then
+        self.z = self.z - 1
+    else
+        sleep(1)
+        return false
+    end
+end
+
+function TGM:rotateTo(d)
+    if self.d == 0  then
+        if d == 1 then
+            self:rotateRight()
+        elseif d == 2 then
+            self:rotateRight()
+            self:rotateRight()
+        elseif d == 3 then
+            self:rotateLeft()
+        end
+    elseif self.d == 1 then
+        if d == 2 then
+            self:rotateRight()
+        elseif d == 3 then
+            self:rotateRight()
+            self:rotateRight()
+        elseif d == 0 then
+            self:rotateLeft()
+        end
+    elseif self.d == 2 then
+        if d == 3 then
+            self:rotateRight()
+        elseif d == 0 then
+            self:rotateRight()
+            self:rotateRight()
+        elseif d == 1 then
+            self:rotateLeft()
+        end
+    elseif self.d == 3  then
+        if d == 0 then
+            self:rotateRight()
+        elseif d == 1 then
+            self:rotateRight()
+            self:rotateRight()
+        elseif d == 2 then
+            self:rotateLeft()
+        end
+    end
+end
+
+function TGM:moveTo(x,y,z)
+    if self:getX() ~= x then
+        -- X
+        if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
+        while self:getX() < x do
+            sleep(0.1)
+            if self:getD() == 1 then
+                self:forward()
+            else 
+                self:back()
+            end
+        end
+        while self:getX() > x do
+            sleep(0.1)
+            if self:getD() == 1 then
+                self:back()
+            else 
+                self:forward()
+            end
+        end
+    end
+    -- Y
+    if self:getY() ~= y then
+        if self:getD() == 1 or self:getD() == 3 then self:rotateTo(0) end
+        while self:getY() < y do
+            sleep(0.1)
+            if self:getD() == 0 then
+                self:forward()
+            else 
+                self:back()
+            end
+        end
+        while self:getY() > y do
+            sleep(0.1)
+            if self:getD() == 0 then
+                self:back()
+            else 
+                self:forward()
+            end
+        end
+    end
+    -- Z
+    while self:getZ() < z do
+        self:up()
+        sleep(0.1)
+    end
+    while self:getZ() > z do
+        sleep(0.1)
+        self:down()
+    end
+end
+
+function TGM:refuel()
+    if turtle.getFuelLevel() == 0 then
+        while turtle.getItemCount(16) == 0 do
+	        clearScreen()
+	        print("Waiting for fuel, press enter when ready")
+	        read()
+        end
+        turtle.select(16)
+        turtle.refuel(1)
+        return true
+    end
+    return true
+end
+
+function TGM:getX()
+    return self.x
+end
+
+function TGM:getY()
+    return self.y
+end
+
+function TGM:getZ()
+    return self.z
+end
+
+function TGM:getD()
+    return self.d
+end
+
+--End TGM
+
+function clearScreen()
+    term.clear()
+end
+
+function askNumber(question)
+    local ans
+    local cont = true
+    clearScreen()
+    while cont == true do -- Width Question
+        print(question)
+        ans = tonumber(read())
+        clearScreen()
+        if ans == nil then
+            print( "Please answer with a number." )
+        elseif ans > 0 then
+            cont = false
+        elseif ans == 0 then
+            print( "Must be greater than 0." )
+        else
+            print( "Must be positive." )
+        end
+    end
+    return ans
+end
+
+
+width = askNumber("Width?")
+height = askNumber("Height?")
+length = askNumber("Length")
+
+bot = TGM.init(1,0,1,0)
+dig = Dig.init()
+
+
+local l = 1
+local w = 2
+local h = 1
+while l <= length do
+    h = 2
+    while h <= height do
+        w = 1
+        while w <= width do
+            if w == 1 and w ~= width then
+                bot:moveTo(w,l-1,h)
+                bot:rotateTo(0)
+                dig:forward()
+            else
+                bot:moveTo(w-1,l,h)
+                bot:rotateTo(1)
+                dig:forward()
+            end
+            bot:moveTo(w,l,h)
+            dig:down()
+            if h - 1 < height then
+                dig:up()
+            end
+            w = w + 1
+        end
+        h = h + 2
+    end
+    print(l)
+    l = l + 1
+end
+
+bot:moveTo(1,0,1)
+bot:rotateTo(0)
