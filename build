@@ -320,8 +320,8 @@ function main()
     local y = 0
     local item = 0
     local len = 0
-
-    while line = f.readLine() do
+    line = f.readLine()
+    while line ~= nil do
         y = y + 1
         len = str:len()
         if len > 0 then
@@ -339,6 +339,7 @@ function main()
             z = z + 1
             y = 0
         end
+        line = f.readLine()
     end
 end
 
