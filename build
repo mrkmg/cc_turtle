@@ -325,10 +325,10 @@ function main()
     line = f.readLine()
     while line ~= nil do
         y = y + 1
-        len = str:len()
+        len = line:len()
         if len > 0 then
             for x = 1, len do
-                item = tonumber(str:sub(x,x))
+                item = tonumber(line:sub(x,x))
                 if item == nil or item == 0 then
                     print("Skipping " .. x .. " , " .. y .. " , " .. z)
                 else
