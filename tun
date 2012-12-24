@@ -6,10 +6,10 @@ Dig = {}
 Dig.__index = Dig
 
 function Dig.init()
-    local _dig = {}
-    setmetatable(_dig,Dig)
-    _dig.collectBlocks = true
-    return _dig
+    local dig = {}
+    setmetatable(dig,Dig)
+    dig.collectBlocks = true
+    return dig
 end
 
 function Dig:forward()
