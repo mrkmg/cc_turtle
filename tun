@@ -301,3 +301,5 @@ for l=1, length do
         end
     end
 end
+bot:moveTo(1,0,1)
+rotateTo(0)
