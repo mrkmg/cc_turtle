@@ -345,7 +345,7 @@ function main()
         end
         line = f.readLine()
     end
-    bot:moveTo(homeLocation[x],homeLocation[x],homeLocation[x])
+    bot:moveTo(homeLocation.x,homeLocation.y,homeLocation.z)
 end
 
 homeLocation = { x = 1, y = 0, z = 1 }
