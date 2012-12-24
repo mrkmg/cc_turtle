@@ -304,8 +304,8 @@ function checkAndRefillSlot(slot)
             print("Please refill crate " .. slot .. " and press enter.")
             read()
         end
-        bot.moveTo(bot:getX(),bot:getY(),returnZ)
-        bot.moveTo(bot:getX(),returnY,returnZ)
+        bot.moveTo(box.x,box.y,returnZ)
+        bot.moveTo(box.x,returnY,returnZ)
         bot:moveTo(returnX,returnY,returnZ)
         bot:rotateTo(returnD)
     end
