@@ -253,6 +253,16 @@ end
 
 --End TGM
 
+function placeTorch(x,y,z)
+    if turtle.getItemCount(15) > 0 then
+        if ( x % 5 ) == 0 and ( y % 5) == 2 and ( z ) == 2 then
+            turtle.select(15)
+            turtle.placeDown()
+            turtle.select(1)
+        end
+    end
+end
+
 function clearScreen()
     term.clear()
 end
@@ -309,6 +319,7 @@ while l <= length do
             if h - 1 < height then
                 dig:up()
             end
+            placeTorch()
             w = w + 1
         end
         h = h + 2
