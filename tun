@@ -9,6 +9,7 @@ function Dig.init()
     local _dig = {}
     setmetatable(_dig,Dig)
     _dig.collectBlocks = true
+    return _dig
 end
 
 function Dig:forward()
