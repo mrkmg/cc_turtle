@@ -299,25 +299,19 @@ while l <= length do
                 bot:moveTo(w,l-1,h)
                 bot:rotateTo(0)
                 dig:forward()
-                dig:down()
-                if h - 1 < height then
-                    dig:up()
-                end
+                bot:moveTo(w,l,h)
             elseif w == width then
                 bot:moveTo(w,l,h)
                 bot:rotateTo(1)
                 dig:down()
-                if h - 1 < height then
-                    dig:up()
-                end
             else
-                bot:moveTo(w,l,h)
+                bot:moveTo(w,-l,h)
                 bot:rotateTo(1)
                 dig:forward()
-                dig:down()
-                if h - 1 < height then
-                    dig:up()
-                end
+            end
+            dig:down()
+            if h - 1 < height then
+                dig:up()
             end
             w = w + 1
         end
