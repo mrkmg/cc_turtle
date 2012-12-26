@@ -268,7 +268,7 @@ function getSeed()
     local returnZ = bot:getZ()
     local returnD = bot:getD()
 
-    bot:moveTo(seedLocation[x],seedLocation[y],seedLocation[z])
+    bot:moveTo(seedLocation.x,seedLocation.y,seedLocation.z)
     local failedToPick = true
     while failedToPick do
         for s = 1, 15 do
