@@ -109,8 +109,6 @@ end
 function TGM:moveTo(x,y,z)
     if self:getX() ~= x then
         if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
-        clearScreen()
-        print(x)
         while self:getX() < x do
             sleep(0.1)
             if self:getD() == 1 then
@@ -350,6 +348,9 @@ function main(Args)
     for y = 1,length do
         for x = 1,width do
             if ( (x - 1) % hOff ) == 0 and ( (y - 1) % vOff ) == 0 then
+                clearScreen()
+                print(x)
+                print(y)
                 bot:moveTo(x,y,homeLocation.z+1)
                 placeSeed()
             end
