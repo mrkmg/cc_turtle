@@ -288,11 +288,8 @@ function main()
 end
 
 bot = TGM.init(1,1,1,1)
-dig = Dig.init()
-
-fuelLocation = 16
 
 numIgnore = askNumber("Number of items to ignore",3)
-shafts = askNumber("How many shafts?",3)
+shafts = askNumber("How many shafts?",1)
 
 main()
