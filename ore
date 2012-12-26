@@ -234,15 +234,17 @@ function askNumber(question,default)
 end
 
 function checkForward()
+	local found = false
 	for slot = ignoreMin, 15 do
-		turtle.select(slot)
-		sleep(0.1)
-		if turtle.compare() then
-			return true
-			break
+		if found == false then
+			turtle.select(slot)
+			sleep(0.1)
+			if turtle.compare() then
+				found = true
+			end
 		end
 	end
-	return false
+	return found
 end
 
 function moveDown()
@@ -250,6 +252,7 @@ function moveDown()
 	local foundSlot = 0
 	for slot = ignoreMin, 15 do
 		turtle.select(slot)
+		sleep(0.1)
 		if found == false and turtle.compareDown() then
 			found = true
 			foundSlot = slot
