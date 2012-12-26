@@ -305,6 +305,12 @@ function Dig:down()
     end
 end
 
+function clearScreen()
+    term.clear()
+    writeAt("Ore",5,1)
+    term.setCursorPos( 1, 3 )
+end
+
 function askNumber(question,default)
     local ans
     local cont = true
