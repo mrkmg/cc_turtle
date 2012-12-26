@@ -287,6 +287,7 @@ function getSeed()
             writeBodyProgress()
         end
     end
+    bot:moveTo(seedLocation.x,seedLocation.y,seedLocation.z+2)
     bot:moveTo(returnX,returnY,returnZ)
     bot:rotateTo(returnD)
 end
@@ -365,6 +366,8 @@ function main(Args)
 
     writeBodyTemplate()
     writeBodyTotals()
+
+    bot:moveTo(homeLocation.x,homeLocation.y,homeLocation.z+1)
     local x,y
     for y = 1,length do
         for x = 1,width do
