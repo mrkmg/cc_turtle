@@ -8,10 +8,10 @@ TGM.__index = TGM
 function TGM.init(x,y,z,d)
     local grid = {}
     setmetatable(grid,TGM)
-    grid.x = x
-    grid.y = y
-    grid.z = z
-    grid.d = d
+    grid.x = x or 1
+    grid.y = y or 1
+    grid.z = z or 1
+    grid.d = d or 0
     return grid
 end
 
@@ -33,11 +33,12 @@ function TGM:forward()
         elseif self:getD() == 1 then self.x = self.x + 1
         elseif self:getD() == 2 then self.y = self.y - 1
         elseif self:getD() == 3 then self.x = self.x - 1
+        return true
         end
     else
         sleep(1)
+        return false
     end
-    return true
 end
 
 function TGM:back()
@@ -48,22 +49,31 @@ function TGM:back()
         elseif self:getD() == 2 then self.y = self.y + 1
         elseif self:getD() == 3 then self.x = self.x + 1
         end
+        return true
     else
         sleep(1)
+        return false
     end
-    return true
 end
 
 function TGM:up()
     self:refuel()
-    turtle.up()
-    return true
+    if turtle.up() then
+        self.z = self.z + 1
+        return true
+    else
+        return false
+    end
 end
 
 function TGM:down()
     self:refuel()
-    turtle.down()
-    return true
+    if turtle.down() then
+        self.z = self.z - 1
+    else
+        sleep(1)
+        return false
+    end
 end
 
 function TGM:rotateTo(d)
@@ -108,6 +118,7 @@ end
 
 function TGM:moveTo(x,y,z)
     if self:getX() ~= x then
+        -- X
         if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
         while self:getX() < x do
             sleep(0.1)
@@ -126,6 +137,7 @@ function TGM:moveTo(x,y,z)
             end
         end
     end
+    -- Y
     if self:getY() ~= y then
         if self:getD() == 1 or self:getD() == 3 then self:rotateTo(0) end
         while self:getY() < y do
@@ -145,22 +157,31 @@ function TGM:moveTo(x,y,z)
             end
         end
     end
+    -- Z
+    while self:getZ() < z do
+        self:up()
+        sleep(0.1)
+    end
+    while self:getZ() > z do
+        sleep(0.1)
+        self:down()
+    end
 end
 
 function TGM:refuel()
     if turtle.getFuelLevel() == 0 then
         while turtle.getItemCount(16) == 0 do
-	        clearScreen()
-	        print("Waiting for fuel, press enter when ready")
-	        read()
-	        writeBodyTemplate()
-	        writeBodyTotals()
-	        writeBodyProgress()
+            clearScreen()
+            print("Waiting for fuel, press enter when ready")
+            read()
         end
         turtle.select(16)
         turtle.refuel(1)
         return true
     end
+    writeBodyTemplate()
+    writeBodyTotals()
+    writeBodyProgress()
     return true
 end
 
@@ -348,9 +369,6 @@ function main(Args)
     for y = 1,length do
         for x = 1,width do
             if ( (x - 1) % hOff ) == 0 and ( (y - 1) % vOff ) == 0 then
-                clearScreen()
-                print(x)
-                print(y)
                 bot:moveTo(x,y,homeLocation.z+1)
                 placeSeed()
             end
