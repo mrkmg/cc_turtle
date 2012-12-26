@@ -109,6 +109,7 @@ end
 function TGM:moveTo(x,y,z)
     if self:getX() ~= x then
         if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
+        print(self:getX())
         while self:getX() < x do
             sleep(0.1)
             if self:getD() == 1 then
