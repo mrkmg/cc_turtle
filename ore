@@ -297,11 +297,11 @@ function main()
 		bot:moveTo(bot:getX(),bot:getY(),1)
 		bot:moveTo(bot:getX()+3,1,1)
 	end
-	bot:moveTo(1,1,1)
+	bot:moveTo(3,3,1)
 	bot:rotateTo(0)
 end
 
-bot = TGM.init(2,2,1,1)
+bot = TGM.init(1,1,1,1)
 
 numIgnore = askNumber("Number of items to ignore",3)
 shafts = askNumber("How many shafts?",1)
