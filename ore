@@ -249,19 +249,23 @@ end
 
 function moveDown()
 	local found = false
-	local foundSlot = 0
 	for slot = ignoreMin, 15 do
 		turtle.select(slot)
 		sleep(0.1)
 		if found == false and turtle.compareDown() then
 			found = true
-			foundSlot = slot
 		end
 	end
 	if found then
-		turtle.select(foundSlot)
+		while turtle.getItemCount(ignoreMin-1)  > 0 do
+			clearScreen()
+			print("There must be one empty slot before all of the ignores, please clear space")
+			read()
+		end
+		turtle.select(ignoreMin-1)
 		turtle.digDown()
-		turtle.drop(1)
+		turtle.drop(ignoreMin-1)
+		turtle.select(1)
 	else
 		turtle.digDown()
 	end
@@ -272,6 +276,7 @@ function checkAll()
 	for dir = 0, 3 do
 		bot:rotateTo(dir)
 		if checkForward() == false then
+			turtle.select(1)
 			turtle.dig()
 		end
 	end
