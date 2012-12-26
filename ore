@@ -234,7 +234,7 @@ function askNumber(question,default)
 end
 
 function checkForward()
-	found = false
+	local found = false
 	for slot = ignoreMin, 15 do
 		turtle.select(slot)
 		if found == false and turtle.compare() then
@@ -245,8 +245,8 @@ function checkForward()
 end
 
 function moveDown()
-	found = false
-	foundSlot = 0
+	local found = false
+	local foundSlot = 0
 	for slot = ignoreMin, 15 do
 		turtle.select(slot)
 		if found == false and turtle.compareDown() then
