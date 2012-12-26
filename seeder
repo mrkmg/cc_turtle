@@ -348,13 +348,13 @@ function main(Args)
     for y = 1,length do
         for x = 1,width do
             if ( (x - 1) % hOff ) == 0 and ( (y - 1) % vOff ) == 0 then
-                bot:moveTo(x,y,homeLocation[z]+1)
+                bot:moveTo(x,y,homeLocation.z+1)
                 placeSeed()
             end
         end
     end
 
-    bot:moveTo(homeLocation[x],homeLocation[y],homeLocation[z])
+    bot:moveTo(homeLocation.x,homeLocation.y,homeLocation.z)
     bot:rotateTo(0)
 end
 
