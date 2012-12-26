@@ -257,11 +257,16 @@ function moveDown()
 		end
 	end
 	if found then
+		local rX = bot:getX()
+		local rY = bot:getY()
+		local rZ = bot:getZ()
 		while turtle.getItemCount(ignoreMin-1)  > 0 do
+			bot:moveTo(rX,rY,1)
 			clearScreen()
 			print("There must be one empty slot before all of the ignores, please clear space")
 			read()
 		end
+		bot:moveTo(rX,rY,rZ)
 		turtle.select(ignoreMin-1)
 		turtle.digDown()
 		turtle.drop(ignoreMin-1)
