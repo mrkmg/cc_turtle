@@ -147,7 +147,7 @@
             color = 1,colors = [ null, 0xEFEFEF, 0x303030, 0x80DF1F, 0x1FDF50, 0x1FDFDF, 0x1F4FDF, 0x7F1FDF, 0xDF1FAF, 0xDF1F1F ],
             ray, brush, objectHovered,
             mouse3D, isMouseDown = false, onMouseDownPosition,
-            radious = 1600, theta = 0, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
+            radious = 3200, theta = 0, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
             isShiftDown = false,
             width = 50,
             length = 50,
@@ -528,6 +528,8 @@
             function offsetScene( x, z ) {
                 camera.target.position.x = camera.target.position.x+(x*50);
                 camera.target.position.z = camera.target.position.z+(z*50);
+                camera.x = camera.x + (x * 50)
+                camera.z = camera.z + (z * 50)
                 camera.updateMatrix();
                 interact();
                 render();
