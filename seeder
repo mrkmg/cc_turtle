@@ -299,16 +299,16 @@ function askNumber(question,default)
     local ans
     local cont = true
     clearScreen()
+    if default then question = question.." ("..default..")" end
     while cont == true do -- Width Question
-        if default then question = question.." ("..default..")" end
         print(question)
         ans = tonumber(read())
         clearScreen()
-        if ans == nil and default ~= nil then
-            print( "Please answer with a number." )
-        elseif ans == nil then
+        if ans == nil and default then
             ans = default
             cont = false
+        elseif ans == nil then
+            print( "Please answer with a number." )
         elseif ans > 0 then
             cont = false
         elseif ans == 0 then
