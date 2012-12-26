@@ -259,6 +259,7 @@ function getSeed()
         if failedToPick then
             clearScreen()
             print("Waiting for seed, press enter when ready")
+            print("Need "..(totalNeeded - seedsPlanted).." more")
             read()
             writeBodyTemplate()
             writeBodyTotals()
@@ -294,18 +295,22 @@ function placeSeed()
     writeBodyProgress()
 end
 
-function askNumber(question)
+function askNumber(question,default)
     local ans
-
+    local cont = true
     clearScreen()
-    while WidthQuestion == true do -- Width Question
+    while cont == true do -- Width Question
+        if default then question = question.." ("..default..")" end
         print(question)
         ans = tonumber(read())
         clearScreen()
-        if ans == nil then
+        if ans == nil and default ~= nil then
             print( "Please answer with a number." )
+        elseif ans == nil then
+            ans = default
+            cont = false
         elseif ans > 0 then
-            ans = false
+            cont = false
         elseif ans == 0 then
             print( "Must be greater than 0." )
         else
@@ -329,21 +334,23 @@ seedLocation = {
     z = 0
 }
 
--- seedCrateOffset = 0
-
 function main(Args)
     length = askNumber("What Length is the target area?")
     width = askNumber("What Width is the target area?")
+    hOff = askNumber("Horizantal spacing",1)
+    vOff = askNumber("Vertical spacing",1)
 
-    totalNeeded = length * width
+    totalNeeded = ( length / vOff ) * ( width / hOff )
 
     writeBodyTemplate()
     writeBodyTotals()
     local x,y
     for y = 1,length do
         for x = 1,width do
-            bot:moveTo(x,y,bot:getZ())
-            placeSeed()
+            if ( (x - 1) % hOff ) == 0 and ( (y - 1) % vOff ) == 0 then
+                bot:moveTo(x,y,homeLocation[z]+1)
+                placeSeed()
+            end
         end
     end
 
