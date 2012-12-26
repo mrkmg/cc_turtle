@@ -237,6 +237,7 @@ function checkForward()
 	local found = false
 	for slot = ignoreMin, 15 do
 		turtle.select(slot)
+		sleep(0.1)
 		if found == false and turtle.compare() then
 			found = true
 		end
