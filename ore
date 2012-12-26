@@ -296,7 +296,7 @@ function main()
 	bot:rotateTo(0)
 end
 
-bot = TGM.init(1,1,1,1)
+bot = TGM.init(2,2,1,1)
 
 numIgnore = askNumber("Number of items to ignore",3)
 shafts = askNumber("How many shafts?",1)
