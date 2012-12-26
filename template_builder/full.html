@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
     <head>
-        <title>Voxels</title>
+        <title>Template Builder</title>
         <meta charset="utf-8">
         <style type="text/css">
             html, body {
@@ -147,14 +147,16 @@
             color = 1,colors = [ null, 0xEFEFEF, 0x303030, 0x80DF1F, 0x1FDF50, 0x1FDFDF, 0x1F4FDF, 0x7F1FDF, 0xDF1FAF, 0xDF1F1F ],
             ray, brush, objectHovered,
             mouse3D, isMouseDown = false, onMouseDownPosition,
-            radious = 1600, theta = 45, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
+            radious = 1600, theta = 0, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
             isShiftDown = false,
             width = 50,
             length = 50,
             height = 50;
 
+            setTimeout(function(){
             init();
             render();
+            },200);
 
             function init() {
 
@@ -166,9 +168,13 @@
                 info.style.top = '5px';
                 info.style.width = '100%';
                 info.style.textAlign = 'center';
-                info.innerHTML = '<span style="color: #444; background-color: #fff; border-bottom: 1px solid #ddd; padding: 8px 10px; text-transform: uppercase;"><strong>0 - 9</strong>: colors, <strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel, <strong>drag</strong>: rotate | <a id="link" href="" target="_blank">share</a> <a href="javascript:save();">save</a> <a href="javascript:clear();">clear</a></span>';
+                info.innerHTML = 
+                '<span style="color: #444; background-color: #fff; border-bottom: 1px solid #ddd; padding: 8px 10px; text-transform: uppercase;"> \
+                <strong>1 - 9</strong>: colors, <strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel,\
+                <strong>drag</strong>: rotate | <a href="javascript:loadHash();">Save/Load</a>\
+                 <a href="javascript:save();">Compile</a> <a href="javascript:clear();">clear</a></span>';
                 container.appendChild( info );
- 
+
                 camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
                 camera.position.x = radious * Math.sin( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
                 camera.position.y = radious * Math.sin( phi * Math.PI / 360 );
@@ -236,6 +242,10 @@
 
                 renderer = new THREE.CanvasRenderer();
                 renderer.setSize( window.innerWidth, window.innerHeight );
+                window.onresize = function(event) {
+                    renderer.setSize( window.innerWidth, window.innerHeight );
+                    render();
+                }
 
                 container.appendChild(renderer.domElement);
 
@@ -247,12 +257,6 @@
                 container.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
                 container.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
-
-                if ( window.location.hash ) {
-
-                    buildFromHash();
-
-                }
 
             }
 
@@ -378,7 +382,6 @@
 
                 }
 
-                updateHash();
                 interact();
                 render();
 
@@ -407,9 +410,8 @@
 
             }
 
-            function buildFromHash() {
-
-                var hash = window.location.hash.substr( 1 ),
+            function buildFromHash(hash) {
+                clear();
                 version = hash.substr( 0, 2 );
 
                 if ( version == "A/" ) {
@@ -454,8 +456,6 @@
                     }
 
                 }
-
-                updateHash();
 
             }
 
@@ -521,8 +521,7 @@
                 }
 
                 data = encode( data );
-                window.location.hash = "A/" + data;
-                document.getElementById( 'link' ).href = "http://mrdoob.com/projects/voxels/#A/" + data;
+                return "A/"+data;
 
             }
 
@@ -649,10 +648,30 @@
                 }
 
                 string = fixStringUp(string);
-                show = document.createElement( 'textarea' );
+                var show = document.createElement( 'textarea' );
                 container.style.display = "none";
                 document.body.appendChild(show);
-                show.value = string;
+                show.value =  string;
+                show.addEventListener('keyup',function(ev){
+                    if( ev.keyCode == 27 ){
+                        container.style.display = "block";
+                        discardElement(show);
+                    }
+                });
+            }
+
+            function loadHash(){
+                var show = document.createElement( 'textarea' );
+                container.style.display = "none";
+                document.body.appendChild(show);
+                show.value =  updateHash()
+                show.addEventListener('keyup',function(ev){
+                    if( ev.keyCode == 27 ){
+                        buildFromHash(show.value);
+                        container.style.display = "block";
+                        discardElement(show);
+                    }
+                });
             }
 
             function fixStringUp(string){
@@ -663,14 +682,6 @@
             }
 
             function clear() {
-
-                if ( !confirm( 'Are you sure?' ) ) {
-
-                    return
-
-                }
-
-                window.location.hash = "";
 
                 var i = 0;
 
@@ -687,7 +698,6 @@
                     i ++;
                 }
 
-                updateHash();
                 render();
 
             }
@@ -720,6 +730,26 @@
                 }
                 return { width : e[ a+'Width' ] , height : e[ a+'Height' ] }
             }
+            var garbageBin;
+            if (typeof(garbageBin) === 'undefined')
+            {
+            //Here we are creating a 'garbage bin' object to temporarily 
+            //store elements that are to be discarded
+            garbageBin = document.createElement('div');
+            garbageBin.style.display = 'none'; //Make sure it is not displayed
+            document.body.appendChild(garbageBin);
+            }
+            function discardElement(element)
+            {
+            //The way this works is due to the phenomenon whereby child nodes
+            //of an object with it's innerHTML emptied are removed from memory
+
+            //Move the element to the garbage bin element
+            garbageBin.appendChild(element);
+            //Empty the garbage bin
+            garbageBin.innerHTML = "";
+            }
+
         </script>
 
     </body>
