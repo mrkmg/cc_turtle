@@ -594,11 +594,11 @@
             function save() {
                 var i = 0;
                 var blocks = [];
-                for(var x = 0;x < 20;x++){
+                for(var x = 0;x < 40;x++){
                     blocks[x] = [];
-                    for(var y = 0;y < 20;y++){
+                    for(var y = 0;y < 40;y++){
                         blocks[x][y] = [];
-                        for(var z = 1;z < 21;z++){
+                        for(var z = 1;z < 41;z++){
                             blocks[x][y][z] = 0;
                         }
                     }
@@ -610,22 +610,25 @@
                     object = scene.objects[ i ];
 
                     if ( object instanceof THREE.Mesh && object !== plane && object !== brush ) {
-                        current.x = ( object.position.x/50 ) + 9.5
-                        current.y = ( object.position.z/50 ) + 9.5
+                        current.x = ( object.position.x/50 ) + 19.5
+                        current.y = ( object.position.z/50 ) + 19.5
                         current.z = ( object.position.y/50 ) + 0.5
                         current.c = colors.indexOf( object.material[ 0 ].color.hex & 0xffffff );
+                        console.log(current.x,current.y,current.z);
                         blocks[current.x][current.y][current.z] = current.c
+
                     }
 
                     i++;
                 }
 
                 var string = "";
-                for(var z = 1;z < 20;z++){
+                minZeros = 0;
+                for(var z = 1;z < 40;z++){
                     var yCheck = 0,yString = "";
-                    for(var y = 0;y < 20;y++){
+                    for(var y = 0;y < 40;y++){
                         var xCheck = 0,xString = "";
-                        for(var x = 0;x < 20;x++){
+                        for(var x = 0;x < 40;x++){
                             xString += blocks[x][y][z];
                             xCheck = Math.max(xCheck,blocks[x][y][z])
                         }
@@ -644,12 +647,19 @@
                     }
                     string += "\n"
                 }
-                string = string.replace(/(0\n)/g,"")
-                string = string.replace(/[\r\n|\r|\n]+$/g,"");
+
+                string = fixStringUp(string);
                 show = document.createElement( 'textarea' );
                 container.style.display = "none";
                 document.body.appendChild(show);
                 show.value = string;
+            }
+
+            function fixStringUp(string){
+                string = string.replace(/[1-9](0+\n)/g,""); //Remove 0 at end of each line
+                string = string.replace(/(0\n)+\n/g,"\n"); //Remove 0 at end of each block
+                string = string.replace(/[\r\n|\r|\n]+$/g,"");//Remove empty blocks
+                return string
             }
 
             function clear() {
