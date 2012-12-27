@@ -291,10 +291,10 @@ document.oncontextmenu=new Function("return false")
                     case 57: setBrushColor( 9 ); break;
                     //case 48: setBrushColor( 9 ); break;
 
-                    case 65: offsetScene( - 1, 0 ); break;
-                    case 87: offsetScene( 0, - 1 ); break;
-                    case 68: offsetScene( 1, 0 ); break;
-                    case 83: offsetScene( 0, 1 ); break;
+                    case 87: offsetScene( 0 ); break;
+                    case 68: offsetScene( 1 ); break;
+                    case 83: offsetScene( 2 ); break;
+                    case 65: offsetScene( 3); break;
 
                     case 84: toggleTrans(); break;
                     case 69: isShiftDown = isShiftDown?false:true; break;
@@ -356,7 +356,6 @@ document.oncontextmenu=new Function("return false")
             function onDocumentMouseUp( event ) {
 
                 event.preventDefault();
-                console.log(event);
 
                 isMouseDown = false;
 
@@ -553,34 +552,81 @@ document.oncontextmenu=new Function("return false")
 
             }
 
-            function offsetScene( x, z ) {
-                //normalize
-                var nX = camera.position.x - camera.target.position.x;
-                var nZ = camera.position.z - camera.target.position.z;
+            function offsetScene( moveDir ) {
+                var nX = camera.position.x - camera.target.position.x,
+                    nZ = camera.position.z - camera.target.position.z,
 
-                if( Math.abs(nX) > Math.abs(nZ) ){
-                    if(nX > camera.target.position.x){
-                        dx = z;
-                        dz = -1*x;
-                    }
-                    else{
-                        dx = -1*z;
-                        dz = x;
-                    }
+                    absX = Math.abs(nX),
+                    absZ = Math.abs(nZ),
+                    totalChange = absX + absZ,
+                    changeX = absX/totalChange,
+                    changeZ = absZ/totalChange;
+
+                switch(moveDir){
+                    case 0:
+                        x = -1*changeX;
+                        z = -1*changeZ;
+                        break;
+                    case 1:
+                        x = changeZ;
+                        z = changeX;
+                        break;
+                    case 2:
+                        x = changeX;
+                        z = changeZ;
+                        break;
+                    case 3:
+                        x = -1*changeZ;
+                        z = -1*changeX;
+                        break;
                 }
-                else
-                {
-                    if(nZ > camera.target.position.z){
+
+                if(nX >= 0 && nZ >= 0){
+                    viewDir = 0
+                }
+                else if(nX >= 0 && nZ < 0){
+                    viewDir = 1
+                }
+                else if(nX < 0 && nZ >= 0){
+                    viewDir = 3
+                }
+                else if(nX < 0 && nZ < 0){
+                    viewDir = 2
+                }
+
+                console.log("MoveDir:"+moveDir+"\nViewDir:"+viewDir+"\nChange:"+x+","+z);
+
+                switch(viewDir){
+                    case 0:
                         dx = x;
+                        dz = -z;
+                        break;
+                    case 1:
+                        if(moveDir % 2 == 1){
+                            dx = -x;
+                            dz = -z;
+                        }
+                        else{
+                            dx = x;
+                            dz = -z; 
+                        }
+                        break;
+                    case 2:
+                        dx = -x;
                         dz = z;
-                    }
-                    else{
-                        dx = -1*x;
-                        dz = -1*z;
-                    }
+                        break;
+                    case 3:
+                        if(moveDir % 2 == 1){
+                            dx = z;
+                            dz = x;
+                        }
+                        else{
+                            dx = -x;
+                            dz = z;
+                        }
+                        break;
                 }
-                console.log(dx,dz);
-
+                
                 camera.target.position.x = camera.target.position.x+(dx*50);
                 camera.target.position.z = camera.target.position.z+(dz*50);
                 camera.position.x = camera.position.x + (dx * 50)
@@ -685,7 +731,6 @@ document.oncontextmenu=new Function("return false")
                         current.y = ( object.position.z/50 ) + 19.5
                         current.z = ( object.position.y/50 ) + 0.5
                         current.c = colors.indexOf( object.material[ 0 ].color.hex & 0xffffff );
-                        console.log(current.x,current.y,current.z);
                         blocks[current.x][current.y][current.z] = current.c
 
                     }
