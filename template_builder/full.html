@@ -297,6 +297,7 @@ document.oncontextmenu=new Function("return false")
                     case 83: offsetScene( 0, 1 ); break;
 
                     case 84: toggleTrans(); break;
+                    case 69: isShiftDown = isShiftDown?false:true; break;
 
                 }
 
@@ -337,9 +338,9 @@ document.oncontextmenu=new Function("return false")
 
                     phi = Math.min( 180, Math.max( 0, phi ) );
 
-                    camera.position.x = radious * Math.sin( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
-                    camera.position.y = radious * Math.sin( phi * Math.PI / 360 );
-                    camera.position.z = radious * Math.cos( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
+                    camera.position.x = camera.target.position.x + radious * Math.sin( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
+                    camera.position.y = camera.target.position.y + radious * Math.sin( phi * Math.PI / 360 );
+                    camera.position.z = camera.target.position.z + radious * Math.cos( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
                     camera.updateMatrix();
 
                 }
@@ -367,9 +368,10 @@ document.oncontextmenu=new Function("return false")
                     return;
 
                 }
-                var isShiftDown = false;
-                if(event.which == 3){
-                    var isShiftDown = true;
+                var rightOnly = false;
+                if(event.which == 3 && isShiftDown == false){
+                    isShiftDown = true;
+                    rightOnly = true;
                 }
                 var intersect, intersects = ray.intersectScene( scene );
 
@@ -404,6 +406,10 @@ document.oncontextmenu=new Function("return false")
 
                 }
 
+                if(rightOnly){
+                    isShiftDown = false;
+                }
+
                 interact();
                 render();
 
@@ -413,9 +419,9 @@ document.oncontextmenu=new Function("return false")
 
                 radious -= event.wheelDeltaY;
 
-                camera.position.x = radious * Math.sin( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
-                camera.position.y = radious * Math.sin( phi * Math.PI / 360 );
-                camera.position.z = radious * Math.cos( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
+                camera.position.x = camera.target.position.x + radious * Math.sin( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
+                camera.position.y = camera.target.position.y + radious * Math.sin( phi * Math.PI / 360 );
+                camera.position.z = camera.target.position.z + radious * Math.cos( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
                 camera.updateMatrix();
 
                 interact();
@@ -548,10 +554,38 @@ document.oncontextmenu=new Function("return false")
             }
 
             function offsetScene( x, z ) {
-                camera.target.position.x = camera.target.position.x+(x*50);
-                camera.target.position.z = camera.target.position.z+(z*50);
-                camera.x = camera.x + (x * 50)
-                camera.z = camera.z + (z * 50)
+                //normalize
+                var nX = camera.position.x - camera.target.position.x;
+                var nZ = camera.position.z - camera.target.position.z;
+
+                if( Math.abs(nX) > Math.abs(nZ) ){
+                    if(nX > camera.target.position.x){
+                        dx = z;
+                        dz = -1*x;
+                    }
+                    else{
+                        dx = -1*z;
+                        dz = x;
+                    }
+                }
+                else
+                {
+                    if(nZ > camera.target.position.z){
+                        dx = x;
+                        dz = z;
+                    }
+                    else{
+                        dx = -1*x;
+                        dz = -1*z;
+                    }
+                }
+                console.log(dx,dz);
+
+                camera.target.position.x = camera.target.position.x+(dx*50);
+                camera.target.position.z = camera.target.position.z+(dz*50);
+                camera.position.x = camera.position.x + (dx * 50)
+                camera.position.z = camera.position.z + (dz * 50)
+                
                 camera.updateMatrix();
                 interact();
                 render();
