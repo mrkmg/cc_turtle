@@ -608,8 +608,14 @@ document.oncontextmenu=new Function("return false")
 
                 switch(viewDir){
                     case 0:
-                        dx = x;
-                        dz = -z;
+                        if(moveDir %2 == 0){
+                            dx = x;
+                            dz = z;
+                        }
+                        else{
+                            dx = x;
+                            dz = -z;
+                        }
                         break;
                     case 1:
                         if(moveDir % 2 == 1){
@@ -622,8 +628,14 @@ document.oncontextmenu=new Function("return false")
                         }
                         break;
                     case 2:
-                        dx = -x;
-                        dz = z;
+                        if(moveDir %2 == 0){
+                            dx = -x;
+                            dz = -z;
+                        }
+                        else{
+                            dx = -x;
+                            dz = z;
+                        }
                         break;
                     case 3:
                         if(moveDir % 2 == 1){
@@ -671,7 +683,7 @@ document.oncontextmenu=new Function("return false")
                             if ( intersect.object != plane ) {
 
                                 objectHovered = intersect.object;
-                                objectHovered.material[ 0 ].color.a = 0.5;
+                                objectHovered.material[ 0 ].color.a = 0.2;
                                 objectHovered.material[ 0 ].color.updateStyleString();
 
                                 return;
