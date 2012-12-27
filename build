@@ -399,13 +399,16 @@ function makeLayerPlan(layer)
     return plan
 end
 
-function runPlan(plan)
+function runPlan(plan,z)
     local current
+    local buildHeight = z + 1
+    bot:moveTo(bot:getX(),bot:getY(),buildHeight)
     for i=1, table.maxn(plan) do
         current = plan[i]
         print(current.x .. ", " .. current.y .. ", " .. current.b)
+        bot:moveTo(current.x,current.y,buildHeight)
+        placeDown(current.b)
     end
-    read()
 end
 
 function main()
@@ -436,14 +439,14 @@ function main()
             end
         else
             plan = makeLayerPlan(layer)
-            runPlan(plan);
+            runPlan(plan,z);
             layer = {}
             z = z + 1
             y = 0
         end
         line = f.readLine()
     end
-    --bot:moveTo(homeLocation.x,homeLocation.y,homeLocation.z)
+    bot:moveTo(homeLocation.x,homeLocation.y,homeLocation.z)
 end
 
 homeLocation = { x = 1, y = 0, z = 1 }
