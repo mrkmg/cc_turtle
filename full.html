@@ -182,16 +182,25 @@ document.oncontextmenu=new Function("return false")
                 document.body.appendChild( container );
 
                 var info = document.createElement( 'div' );
-                info.style.positi0on = 'absolute';
-                info.style.top = '5px';
+                info.style.position = 'fixed';
+                info.style.top = '0px';
                 info.style.width = '100%';
                 info.style.textAlign = 'center';
                 info.innerHTML = 
-                '<span style="color: #444; background-color: #fff; border-bottom: 1px solid #ddd; padding: 8px 10px; text-transform: uppercase;"> \
-                <strong>1 - 9</strong>: colors, <strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel,\
-                <strong>drag</strong>: rotate | <a href="javascript:loadHash();">Export/Import</a> \
-                 <a href="javascript:localStore();">Save/Load</a>\
-                 <a href="javascript:save();">Compile</a> <a href="javascript:clear();">clear</a></span>';
+                '<div style="color: #444; background-color: #fff; padding: 8px 10px; text-transform: uppercase;display: inline-block;border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;"> \
+                <strong>1 - 9</strong>: Blocks,\
+                <strong>WASD</strong>: Move Camera,\
+                <strong>T</strong>: Toggle Transparency,\
+                <strong>E</strong>: Toggle Edit Mode\
+                <br />\
+                <strong>Left Click</strong>: Add Block, \
+                <strong>Right Click</strong>: Remove Block,\
+                <strong>Drag</strong>: Spin Camera\
+                <br />\
+                <a href="javascript:loadHash();">Export/Import</a> \
+                <a href="javascript:localStore();">Save/Load</a>\
+                <a href="javascript:save();">Compile</a> <a href="javascript:clear();">clear</a> \
+                </div>';
                 container.appendChild( info );
 
                 camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -770,6 +779,8 @@ document.oncontextmenu=new Function("return false")
                 container.style.display = "none";
                 document.body.appendChild(show);
                 show.value =  string;
+                show.focus();
+                show.select();
                 show.addEventListener('keyup',function(ev){
                     if( ev.keyCode == 27 ){
                         container.style.display = "block";
@@ -783,6 +794,8 @@ document.oncontextmenu=new Function("return false")
                 container.style.display = "none";
                 document.body.appendChild(show);
                 show.value =  updateHash();
+                show.focus();
+                show.select();
                 show.addEventListener('keyup',function(ev){
                     if( ev.keyCode == 27 ){
                         buildFromHash(show.value);
@@ -803,7 +816,11 @@ document.oncontextmenu=new Function("return false")
                 saveButton.innerHTML ="Save";
 
                 saveButton.addEventListener('click', function(ev){
-                    localStorage.setItem(saveInput.value,updateHash());
+                    var con = true
+                    if(localStorage.getItem(saveInput.value)){
+                        con = confirm("This will overwite the current save file. Continue?");
+                    }
+                    if(con) localStorage.setItem(saveInput.value,updateHash());
                 });
 
                 var existingList = document.createElement( 'select' );
@@ -820,6 +837,17 @@ document.oncontextmenu=new Function("return false")
                     buildFromHash(localStorage.getItem(existingList.value));
                 });
 
+                var removeButton = document.createElement('button');
+                removeButton.innerHTML = "Remove";
+
+                removeButton.addEventListener('click',function(){
+                    var con = confirm("Are you sure?");
+                    if(con){
+                        localStorage.removeItem(existingList.value);
+                        existingList.remove(existingList.selectedIndex);
+                    }
+                });
+
                 var close = document.createElement('button');
                 close.innerHTML = "close";
 
@@ -834,6 +862,7 @@ document.oncontextmenu=new Function("return false")
                 show.appendChild(document.createElement('br'));
                 show.appendChild(existingList);
                 show.appendChild(loadButton);
+                show.appendChild(removeButton);
                 show.appendChild(document.createElement('br'));
                 show.appendChild(close);
 
