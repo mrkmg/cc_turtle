@@ -189,7 +189,8 @@ document.oncontextmenu=new Function("return false")
                 info.innerHTML = 
                 '<span style="color: #444; background-color: #fff; border-bottom: 1px solid #ddd; padding: 8px 10px; text-transform: uppercase;"> \
                 <strong>1 - 9</strong>: colors, <strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel,\
-                <strong>drag</strong>: rotate | <a href="javascript:loadHash();">Save/Load</a>\
+                <strong>drag</strong>: rotate | <a href="javascript:loadHash();">Export/Import</a> \
+                 <a href="javascript:localStore();">Save/Load</a>\
                  <a href="javascript:save();">Compile</a> <a href="javascript:clear();">clear</a></span>';
                 container.appendChild( info );
 
@@ -781,7 +782,7 @@ document.oncontextmenu=new Function("return false")
                 var show = document.createElement( 'textarea' );
                 container.style.display = "none";
                 document.body.appendChild(show);
-                show.value =  updateHash()
+                show.value =  updateHash();
                 show.addEventListener('keyup',function(ev){
                     if( ev.keyCode == 27 ){
                         buildFromHash(show.value);
@@ -789,6 +790,57 @@ document.oncontextmenu=new Function("return false")
                         discardElement(show);
                     }
                 });
+            }
+
+            function localStore(){
+                var show = document.createElement( 'div' );
+                show.style.height = "100%";
+                show.style.width = "100%";
+                show.style.textAlign = "center";
+                var saveInput = document.createElement('input');
+                saveInput.type = "text";
+                var saveButton = document.createElement('button');
+                saveButton.innerHTML ="Save";
+
+                saveButton.addEventListener('click', function(ev){
+                    localStorage.setItem(saveInput.value,updateHash());
+                });
+
+                var existingList = document.createElement( 'select' );
+                for(var i in localStorage){
+                    var e = document.createElement("option")
+                    e.value = i;
+                    e.innerHTML = i;
+                    existingList.appendChild(e);
+                }
+                var loadButton = document.createElement('button');
+                loadButton.innerHTML = "Load";
+
+                loadButton.addEventListener('click',function(){
+                    buildFromHash(localStorage.getItem(existingList.value));
+                });
+
+                var close = document.createElement('button');
+                close.innerHTML = "close";
+
+                close.addEventListener('click',function(ev){
+                    container.style.display = "block";
+                    discardElement(show);
+
+                });
+
+                show.appendChild(saveInput);
+                show.appendChild(saveButton);
+                show.appendChild(document.createElement('br'));
+                show.appendChild(existingList);
+                show.appendChild(loadButton);
+                show.appendChild(document.createElement('br'));
+                show.appendChild(close);
+
+
+                container.style.display = "none";
+                document.body.appendChild(show);
+
             }
 
             function fixStringUp(string){
