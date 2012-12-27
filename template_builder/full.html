@@ -19,8 +19,24 @@
                 height:100%;
             }
         </style>
+        <SCRIPT TYPE="text/javascript"> 
+<!-- 
+//Disable right click script 
+//visit http://www.rainbow.arch.scriptmania.com/scripts/ 
+var message="Sorry, right-click has been disabled"; 
+/////////////////////////////////// 
+function clickIE() {if (document.all) {(message);return false;}} 
+function clickNS(e) {if 
+(document.layers||(document.getElementById&&!document.all)) { 
+if (e.which==2||e.which==3) {(message);return false;}}} 
+if (document.layers) 
+{document.captureEvents(Event.MOUSEDOWN);document.onmousedown=clickNS;} 
+else{document.onmouseup=clickNS;document.oncontextmenu=clickIE;} 
+document.oncontextmenu=new Function("return false") 
+// --> 
+</SCRIPT> 
     </head>
-    <body>
+    <body  oncontextmenu="return false">
 
         <script type="text/javascript">
             // ThreeCanvas.js r28 - http://github.com/mrdoob/three.js
@@ -140,6 +156,8 @@
 
         </script>
         <script type="text/javascript">
+
+            blockOpacity = 1;
 
             var container, interval,
             camera, scene, renderer,
@@ -273,12 +291,12 @@
                     case 57: setBrushColor( 9 ); break;
                     //case 48: setBrushColor( 9 ); break;
 
-                    case 16: isShiftDown = true; interact(); render(); break;
+                    case 65: offsetScene( - 1, 0 ); break;
+                    case 87: offsetScene( 0, - 1 ); break;
+                    case 68: offsetScene( 1, 0 ); break;
+                    case 83: offsetScene( 0, 1 ); break;
 
-                    case 37: offsetScene( - 1, 0 ); break;
-                    case 38: offsetScene( 0, - 1 ); break;
-                    case 39: offsetScene( 1, 0 ); break;
-                    case 40: offsetScene( 0, 1 ); break;
+                    case 84: toggleTrans(); break;
 
                 }
 
@@ -304,6 +322,7 @@
                 onMouseDownPhi = phi;
                 onMouseDownPosition.x = event.clientX;
                 onMouseDownPosition.y = event.clientY;
+                return false;
 
             }
 
@@ -336,6 +355,7 @@
             function onDocumentMouseUp( event ) {
 
                 event.preventDefault();
+                console.log(event);
 
                 isMouseDown = false;
 
@@ -347,7 +367,10 @@
                     return;
 
                 }
-
+                var isShiftDown = false;
+                if(event.which == 3){
+                    var isShiftDown = true;
+                }
                 var intersect, intersects = ray.intersectScene( scene );
 
                 if ( intersects.length > 0 ) {
@@ -368,7 +391,7 @@
 
                             var position = new THREE.Vector3().add( intersect.point, intersect.object.matrixRotation.transform( intersect.face.normal.clone() ) );
 
-                            var voxel = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( colors[ color ], 0.8 ) );
+                            var voxel = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( colors[ color ], blockOpacity ) );
                             voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
                             voxel.position.y = Math.floor( position.y / 50 ) * 50 + 25;
                             voxel.position.z = Math.floor( position.z / 50 ) * 50 + 25;
@@ -429,7 +452,7 @@
                         if ( code.charAt( 4 ) == "1" ) current.c += data[ i ++ ] - 32;
                         if ( code.charAt( 0 ) == "1" ) {
 
-                            var voxel = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( colors[ current.c ], 0.8 ) );
+                            var voxel = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( colors[ current.c ], blockOpacity ) );
                             voxel.position.x = current.x * 50 + 25;
                             voxel.position.y = current.y * 50 + 25;
                             voxel.position.z = current.z * 50 + 25;
@@ -445,7 +468,7 @@
 
                     for ( var i = 0; i < data.length; i += 4 ) {
 
-                        var voxel = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( colors[ data[ i + 3 ], 0.8 ] ) );
+                        var voxel = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( colors[ data[ i + 3 ], blockOpacity ] ) );
                         voxel.position.x = ( data[ i ] - 20 ) * 25;
                         voxel.position.y = ( data[ i + 1 ] + 1 ) * 25;
                         voxel.position.z = ( data[ i + 2 ] - 20 ) * 25;
@@ -539,7 +562,7 @@
 
                 if ( objectHovered ) {
 
-                    objectHovered.material[ 0 ].color.a = 0.8;
+                    objectHovered.material[ 0 ].color.a = blockOpacity;
                     objectHovered.material[ 0 ].color.updateStyleString();
                     objectHovered = null;
 
@@ -583,6 +606,20 @@
 
                 brush.position.y = 2000;
 
+            }
+
+            function toggleTrans(){
+                blockOpacity = blockOpacity==1?0.5:1;
+                for ( var i in scene.objects ) {
+
+                    object = scene.objects[ i ];
+
+                    if ( object instanceof THREE.Mesh && object !== plane && object !== brush ) {
+                        object.material[ 0 ].color.a = blockOpacity;
+                        object.material[ 0 ].color.updateStyleString();
+                    }
+                }
+                render()
             }
 
             function render() {
