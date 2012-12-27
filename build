@@ -317,6 +317,67 @@ function placeDown(slot)
     turtle.placeDown()
 end
 
+function getNextInLayer(layer)
+    local n = {x=0,y=0}
+    for y,t in ipairs(layer) do
+        if n.x == 0 and n.y == 0 then
+            for x,v in ipairs(t) do
+                if n.x == 0 and n.y == 0 and v > 0 then
+                    n.x = x
+                    n.y = y
+               end
+            end
+        end
+    end
+    return n
+end
+
+function makeLayerPlan(layer)
+    local plan = {}
+    local planOffset = 1
+    local n = getNextInLayer(layer)
+    if n.x ~= 0 and n.y ~= 0 then
+        plan[planOffset] = {x=n.x,y=n.y,b=layer[n.y][n.x]}
+    end
+    while n.x ~= 0 and n.y ~= 0 do
+        layer[n.y][n.x] = 0
+
+        if layer[n.y] and layer[n.y][n.x+1] and layer[n.y][n.x+1] > 0 then
+            plan[planOffset] = {x=n.x+1,y=n.y,b=layer[n.y][n.x+1]}
+            planOffset = planOffset + 1
+            n = {x=n.x+1,y=n.y}
+        elseif layer[n.y] and layer[n.y][n.x-1] and layer[n.y][n.x-1] > 0 then
+            plan[planOffset] = {x=n.x-1,y=n.y,b=layer[n.y][n.x-1]}
+            planOffset = planOffset + 1
+            n = {x=n.x-1,y=n.y}
+
+        elseif layer[n.y+1] and layer[n.y+1][n.x] and layer[n.y+1][n.x] > 0 then
+            plan[planOffset] = {x=n.x,y=n.y+1,b=layer[n.y+1][n.x]}
+            planOffset = planOffset + 1
+            n = {x=n.x,y=n.y+1}
+
+        else if layer[n.y-1] and layer[n.y-1][n.x] and layer[n.y-1][n.x] > 0 then
+            plan[planOffset] = {x=n.x,y=n.y-1,b=layer[n.y-1][n.x]}
+            planOffset = planOffset + 1
+            n = {x=n.x,y=n.y-1}
+        else 
+            n = getNextInLayer(layer)
+            if n.x ~= 0 and n.y ~= 0 then
+                plan[planOffset] = {x=n.x,y=n.y,b=layer[n.y][n.x]}
+            end
+        end
+    end
+    return plan
+end
+
+function runPlan(plan)
+    local current
+    for i=0,plan:maxn() do
+        current = plan[i]
+        print(current.x .. ", " .. current.y .. ", " .. current.b)
+    end
+end
+
 function main()
     local height = 1;
     local f = fs.open(template, "r")
@@ -324,28 +385,32 @@ function main()
     local y = 0
     local item = 0
     local len = 0
-    line = f.readLine()
+    local plan = {}
+    local layer = {}
+    local line = f.readLine()
     while line ~= nil do
         y = y + 1
         len = line:len()
         if len > 0 then
+            layer[y] = {}
             for x = 1, len do
                 item = tonumber(line:sub(x,x))
                 if item == nil or item == 0 then
-                    print("Skipping " .. x .. " , " .. y .. " , " .. z)
+                    layer[x][y] = 0
                 else
-                    print("Placing ".. item .. " at " .. x .. " , " .. y .. " , " .. z)
-                    bot:moveTo(x,y,z+1)
-                    placeDown(item)
+                    layer[x][y] = item
                 end
             end
+            plan = makeLayerPlan(layer)
+            runPlan(plan);
         else
             z = z + 1
             y = 0
+            layer = {}
         end
         line = f.readLine()
     end
-    bot:moveTo(homeLocation.x,homeLocation.y,homeLocation.z)
+    --bot:moveTo(homeLocation.x,homeLocation.y,homeLocation.z)
 end
 
 homeLocation = { x = 1, y = 0, z = 1 }

@@ -10,7 +10,7 @@
             body {
                 font-family: Monospace;
                 font-size: 12px;
-                background-color: #f0f0f0;
+                background-color: #000;
                 margin: 0px;
                 overflow: hidden;
             }
@@ -162,7 +162,7 @@ document.oncontextmenu=new Function("return false")
             var container, interval,
             camera, scene, renderer,
             projector, plane, cube, linesMaterial,
-            color = 1,colors = [ null, 0xEFEFEF, 0x303030, 0x80DF1F, 0x1FDF50, 0x1FDFDF, 0x1F4FDF, 0x7F1FDF, 0xDF1FAF, 0xDF1F1F ],
+            color = 1,colors = [ null, 0xD9D9D9, 0x303030, 0x80DF1F, 0x1FDF50, 0x1FDFDF, 0x1F4FDF, 0x7F1FDF, 0xDF1FAF, 0xDF1F1F ],
             ray, brush, objectHovered,
             mouse3D, isMouseDown = false, onMouseDownPosition,
             radious = 3200, theta = 0, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
@@ -207,7 +207,7 @@ document.oncontextmenu=new Function("return false")
                 geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 1000, 0, 0 ) ) );
                 geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 1000, 0, 0 ) ) );
 
-                linesMaterial = new THREE.LineColorMaterial( 0x000000, 0.2 );
+                linesMaterial = new THREE.LineColorMaterial( 0xFFFFFF, 0.2 );
 
                 for ( var i = 0; i <= 40; i ++ ) {
 
@@ -716,7 +716,7 @@ document.oncontextmenu=new Function("return false")
                     for(var y = 0;y < 40;y++){
                         blocks[x][y] = [];
                         for(var z = 1;z < 41;z++){
-                            blocks[x][y][z] = 0;
+                            blocks[x][y][z] = ' ';
                         }
                     }
                 }
@@ -750,11 +750,11 @@ document.oncontextmenu=new Function("return false")
                         }
                         yCheck = Math.max(xCheck,yCheck)
                         if(xCheck > 0){
-                            xString = xString.replace(/0+$/,"")
+                            xString = xString.replace(/ +$/,"")
                             yString += xString;
                         }
                         else {
-                            yString += "0";
+                            yString += " ";
                         }
                         yString += "\n";
                     }
@@ -792,8 +792,8 @@ document.oncontextmenu=new Function("return false")
             }
 
             function fixStringUp(string){
-                string = string.replace(/[1-9](0+\n)/g,""); //Remove 0 at end of each line
-                string = string.replace(/(0\n)+\n/g,"\n"); //Remove 0 at end of each block
+                string = string.replace(/[1-9]( +\n)/g,""); //Remove 0 at end of each line
+                string = string.replace(/( \n)+\n/g,"\n"); //Remove 0 at end of each block
                 string = string.replace(/[\r\n|\r|\n]+$/g,"");//Remove empty blocks
                 return string
             }
