@@ -324,12 +324,13 @@ document.oncontextmenu=new Function("return false")
             }
 
             mouseButton = 1;
+            timeout = null
             function onDocumentMouseDown( event ) {
 
                 event.preventDefault();
                 mouseButton = event.which;
 
-                isMouseDown = true;
+                timeout = setTimeout(function(){isMouseDown = true;},100);
 
                 onMouseDownTheta = theta;
                 onMouseDownPhi = phi;
@@ -386,7 +387,7 @@ document.oncontextmenu=new Function("return false")
             function onDocumentMouseUp( event ) {
 
                 event.preventDefault();
-
+                clearTimeout(timeout);
                 isMouseDown = false;
 
                 onMouseDownPosition.x = event.clientX - onMouseDownPosition.x;
@@ -836,6 +837,8 @@ document.oncontextmenu=new Function("return false")
                 });
             }
 
+            var lastStoreName = "";
+
             function localStore(){
                 var show = document.createElement( 'div' );
                 show.style.height = "100%";
@@ -843,6 +846,7 @@ document.oncontextmenu=new Function("return false")
                 show.style.textAlign = "center";
                 var saveInput = document.createElement('input');
                 saveInput.type = "text";
+                saveInput.value = lastStoreName;
                 var saveButton = document.createElement('button');
                 saveButton.innerHTML ="Save";
 
@@ -851,7 +855,10 @@ document.oncontextmenu=new Function("return false")
                     if(localStorage.getItem(saveInput.value)){
                         con = confirm("This will overwite the current save file. Continue?");
                     }
-                    if(con) localStorage.setItem(saveInput.value,updateHash());
+                    if(con){
+                        localStorage.setItem(saveInput.value,updateHash());
+                        lastStoreName = saveInput.value;
+                    }
                 });
 
                 var existingList = document.createElement( 'select' );
@@ -866,6 +873,7 @@ document.oncontextmenu=new Function("return false")
 
                 loadButton.addEventListener('click',function(){
                     buildFromHash(localStorage.getItem(existingList.value));
+                    lastStoreName = existingList.value;
                 });
 
                 var removeButton = document.createElement('button');
