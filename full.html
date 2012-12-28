@@ -165,7 +165,7 @@ document.oncontextmenu=new Function("return false")
             color = 1,colors = [ null, 0xD9D9D9, 0x303030, 0x80DF1F, 0x1FDF50, 0x1FDFDF, 0x1F4FDF, 0x7F1FDF, 0xDF1FAF, 0xDF1F1F ],
             ray, brush, objectHovered,
             mouse3D, isMouseDown = false, onMouseDownPosition,
-            radious = 3200, theta = 0, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
+            radious = 3200, theta = 360, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
             isShiftDown = false,
             width = 50,
             length = 50,
@@ -200,6 +200,19 @@ document.oncontextmenu=new Function("return false")
                 <a href="javascript:loadHash();">Export/Import</a> \
                 <a href="javascript:localStore();">Save/Load</a>\
                 <a href="javascript:save();">Compile</a> <a href="javascript:clear();">clear</a> \
+                <br />\
+                <strong>Stats</strong> W: <span id="maxW"></span> | \
+                L: <span id="maxL"></span> | \
+                H: <span id="maxH"></span> | \
+                1: <span id="count1"></span> | \
+                2: <span id="count2"></span> | \
+                3: <span id="count3"></span> | \
+                4: <span id="count4"></span> | \
+                5: <span id="count5"></span> | \
+                6: <span id="count6"></span> | \
+                7: <span id="count7"></span> | \
+                8: <span id="count8"></span> | \
+                9: <span id="count9"></span>  \
                 </div>';
                 container.appendChild( info );
 
@@ -306,6 +319,11 @@ document.oncontextmenu=new Function("return false")
                     case 83: offsetScene( 2, 50, true ); break;
                     case 65: offsetScene( 3, 50, true ); break;
 
+                    case 39: moveBlocks( -1 , 0 ); break;
+                    case 37: moveBlocks( 1 , 0 ); break;
+                    case 38: moveBlocks( 0 , 1 ); break;
+                    case 40: moveBlocks( 0 , -1 ); break;
+
                     case 84: toggleTrans(); break;
                     case 69: isShiftDown = isShiftDown?false:true; break;
 
@@ -353,7 +371,7 @@ document.oncontextmenu=new Function("return false")
                         theta = - ( ( event.clientX - onMouseDownPosition.x ) * 0.5 ) + onMouseDownTheta;
                         phi = ( ( event.clientY - onMouseDownPosition.y ) * 0.5 ) + onMouseDownPhi;
 
-                        phi = Math.min( 180, Math.max( 0, phi ) );
+                        phi = Math.min( 180, Math.max( phi ) );
 
                         camera.position.x = camera.target.position.x + radious * Math.sin( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
                         camera.position.y = camera.target.position.y + radious * Math.sin( phi * Math.PI / 360 );
@@ -583,6 +601,28 @@ document.oncontextmenu=new Function("return false")
 
             }
 
+            function moveBlocks( x, z ) {
+
+                var offset = new THREE.Vector3( x, 0, z ).multiplyScalar( 50 );
+
+                for ( var i in scene.objects ) {
+
+                    object = scene.objects[ i ];
+
+                    if ( object instanceof THREE.Mesh && object !== plane && object !== brush ) {
+
+                        object.position.addSelf( offset );
+
+                    }
+
+                }
+
+                updateHash();
+                interact();
+                render();
+
+            }
+
             function offsetScene( moveDir , amount, doRender) {
                 var nX = camera.position.x - camera.target.position.x,
                     nZ = camera.position.z - camera.target.position.z,
@@ -745,8 +785,20 @@ document.oncontextmenu=new Function("return false")
             }
 
             function render() {
-
                 renderer.render( scene, camera );
+                stats = getStats();
+                document.getElementById('maxW').innerHTML = stats.maxW;
+                document.getElementById('maxH').innerHTML = stats.maxH;
+                document.getElementById('maxL').innerHTML = stats.maxL;
+                document.getElementById('count1').innerHTML = stats.counts[1];
+                document.getElementById('count2').innerHTML = stats.counts[2];
+                document.getElementById('count3').innerHTML = stats.counts[3];
+                document.getElementById('count4').innerHTML = stats.counts[4];
+                document.getElementById('count5').innerHTML = stats.counts[5];
+                document.getElementById('count6').innerHTML = stats.counts[6];
+                document.getElementById('count7').innerHTML = stats.counts[7];
+                document.getElementById('count8').innerHTML = stats.counts[8];
+                document.getElementById('count9').innerHTML = stats.counts[9];
 
             }
 
@@ -769,11 +821,11 @@ document.oncontextmenu=new Function("return false")
                     object = scene.objects[ i ];
 
                     if ( object instanceof THREE.Mesh && object !== plane && object !== brush ) {
-                        current.x = ( object.position.x/50 ) + 19.5
-                        current.y = ( object.position.z/50 ) + 19.5
-                        current.z = ( object.position.y/50 ) + 0.5
+                        current.x = 39 - ( ( object.position.x/50 ) + 19.5 );
+                        current.y = ( object.position.z/50 ) + 19.5;
+                        current.z = ( object.position.y/50 ) + 0.5;
                         current.c = colors.indexOf( object.material[ 0 ].color.hex & 0xffffff );
-                        blocks[current.x][current.y][current.z] = current.c
+                        blocks[current.x][current.y][current.z] = current.c;
 
                     }
 
@@ -937,6 +989,44 @@ document.oncontextmenu=new Function("return false")
 
                 render();
 
+            }
+
+            function getStats(){
+                var stats = {
+                    maxW:0,
+                    maxL:0,
+                    maxH:0,
+                    counts:{
+                        1:0,
+                        2:0,
+                        3:0,
+                        4:0,
+                        5:0,
+                        6:0,
+                        7:0,
+                        8:0,
+                        9:0,
+
+                    }
+                }
+
+                var i = 0;
+                while ( i < scene.objects.length ) {
+
+                    object = scene.objects[ i ];
+
+                    if ( object instanceof THREE.Mesh && object !== plane && object !== brush ) {
+                        if( object.position.x , object.position.y , object.position.z ){
+                            stats.maxW = Math.max(39 - ( ( object.position.x/50 ) + 19.5 ),stats.maxW);
+                            stats.maxL = Math.max(( object.position.z/50 ) + 19.5,stats.maxL);
+                            stats.maxH = Math.max(( object.position.y/50 ) + 0.5,stats.maxH);
+                            stats.counts[colors.indexOf( object.material[ 0 ].color.hex & 0xffffff )]++;
+                        }
+                    }
+
+                    i++;
+                }
+                return stats;
             }
 
             // https://gist.github.com/665235
