@@ -316,7 +316,7 @@ while l <= length do
             end
             bot:moveTo(w,l,h)
             dig:down()
-            if h - 1 < height then
+            if h - 1 <= height then
                 dig:up()
             end
             placeTorch(w,l,h)
