@@ -165,7 +165,7 @@ document.oncontextmenu=new Function("return false")
             color = 1,colors = [ null, 0xD9D9D9, 0x303030, 0x80DF1F, 0x1FDF50, 0x1FDFDF, 0x1F4FDF, 0x7F1FDF, 0xDF1FAF, 0xDF1F1F ],
             ray, brush, objectHovered,
             mouse3D, isMouseDown = false, onMouseDownPosition,
-            radious = 3200, theta = 0, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
+            radious = 3200, theta = 360, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
             isShiftDown = false,
             width = 50,
             length = 50,
@@ -200,6 +200,19 @@ document.oncontextmenu=new Function("return false")
                 <a href="javascript:loadHash();">Export/Import</a> \
                 <a href="javascript:localStore();">Save/Load</a>\
                 <a href="javascript:save();">Compile</a> <a href="javascript:clear();">clear</a> \
+                <br />\
+                <strong>Stats</strong> W: <span id="maxW"></span> | \
+                L: <span id="maxL"></span> | \
+                H: <span id="maxH"></span> | \
+                1: <span id="count1"></span> | \
+                2: <span id="count2"></span> | \
+                3: <span id="count3"></span> | \
+                4: <span id="count4"></span> | \
+                5: <span id="count5"></span> | \
+                6: <span id="count6"></span> | \
+                7: <span id="count7"></span> | \
+                8: <span id="count8"></span> | \
+                9: <span id="count9"></span>  \
                 </div>';
                 container.appendChild( info );
 
@@ -301,10 +314,15 @@ document.oncontextmenu=new Function("return false")
                     case 57: setBrushColor( 9 ); break;
                     //case 48: setBrushColor( 9 ); break;
 
-                    case 87: offsetScene( 0 ); break;
-                    case 68: offsetScene( 1 ); break;
-                    case 83: offsetScene( 2 ); break;
-                    case 65: offsetScene( 3); break;
+                    case 87: offsetScene( 0, 50, true ); break;
+                    case 68: offsetScene( 1, 50, true ); break;
+                    case 83: offsetScene( 2, 50, true ); break;
+                    case 65: offsetScene( 3, 50, true ); break;
+
+                    case 39: moveBlocks( -1 , 0 ); break;
+                    case 37: moveBlocks( 1 , 0 ); break;
+                    case 38: moveBlocks( 0 , 1 ); break;
+                    case 40: moveBlocks( 0 , -1 ); break;
 
                     case 84: toggleTrans(); break;
                     case 69: isShiftDown = isShiftDown?false:true; break;
@@ -323,36 +341,57 @@ document.oncontextmenu=new Function("return false")
 
             }
 
+            mouseButton = 1;
+            timeout = null
             function onDocumentMouseDown( event ) {
 
                 event.preventDefault();
+                mouseButton = event.which;
 
-                isMouseDown = true;
+                timeout = setTimeout(function(){isMouseDown = true;},100);
 
                 onMouseDownTheta = theta;
                 onMouseDownPhi = phi;
                 onMouseDownPosition.x = event.clientX;
                 onMouseDownPosition.y = event.clientY;
+
                 return false;
 
             }
 
+            inMove = false;
             function onDocumentMouseMove( event ) {
-
+                if(inMove) return;
+                inMove = true;
                 event.preventDefault();
 
                 if ( isMouseDown ) {
 
-                    theta = - ( ( event.clientX - onMouseDownPosition.x ) * 0.5 ) + onMouseDownTheta;
-                    phi = ( ( event.clientY - onMouseDownPosition.y ) * 0.5 ) + onMouseDownPhi;
+                    if(mouseButton == 1){
+                        theta = - ( ( event.clientX - onMouseDownPosition.x ) * 0.5 ) + onMouseDownTheta;
+                        phi = ( ( event.clientY - onMouseDownPosition.y ) * 0.5 ) + onMouseDownPhi;
 
-                    phi = Math.min( 180, Math.max( 0, phi ) );
+                        phi = Math.min( 180, Math.max( phi ) );
 
-                    camera.position.x = camera.target.position.x + radious * Math.sin( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
-                    camera.position.y = camera.target.position.y + radious * Math.sin( phi * Math.PI / 360 );
-                    camera.position.z = camera.target.position.z + radious * Math.cos( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
-                    camera.updateMatrix();
+                        camera.position.x = camera.target.position.x + radious * Math.sin( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
+                        camera.position.y = camera.target.position.y + radious * Math.sin( phi * Math.PI / 360 );
+                        camera.position.z = camera.target.position.z + radious * Math.cos( theta * Math.PI / 360 ) * Math.cos( phi * Math.PI / 360 );
+                        camera.updateMatrix();
+                    }
+                    else if(mouseButton == 3){
+                        xDir = onMouseDownPosition.x > event.clientX ? 1 : 3;
+                        yDir = onMouseDownPosition.y > event.clientY ? 2 : 0;
 
+                        dX = Math.abs(onMouseDownPosition.x  - event.clientX);
+                        dY = Math.abs(onMouseDownPosition.y  - event.clientY);
+
+                        offsetScene(xDir,dX*5,false);
+                        offsetScene(yDir,dY*5,false);
+                        camera.updateMatrix();
+
+                        onMouseDownPosition.x = event.clientX;
+                        onMouseDownPosition.y = event.clientY;
+                    }
                 }
 
                 mouse3D = projector.unprojectVector( new THREE.Vector3( ( event.clientX / renderer.domElement.width ) * 2 - 1, - ( event.clientY / renderer.domElement.height ) * 2 + 1, 0.5 ), camera );
@@ -360,13 +399,13 @@ document.oncontextmenu=new Function("return false")
 
                 interact();
                 render();
-
+                inMove = false;
             }
 
             function onDocumentMouseUp( event ) {
 
                 event.preventDefault();
-
+                clearTimeout(timeout);
                 isMouseDown = false;
 
                 onMouseDownPosition.x = event.clientX - onMouseDownPosition.x;
@@ -562,15 +601,37 @@ document.oncontextmenu=new Function("return false")
 
             }
 
-            function offsetScene( moveDir ) {
+            function moveBlocks( x, z ) {
+
+                var offset = new THREE.Vector3( x, 0, z ).multiplyScalar( 50 );
+
+                for ( var i in scene.objects ) {
+
+                    object = scene.objects[ i ];
+
+                    if ( object instanceof THREE.Mesh && object !== plane && object !== brush ) {
+
+                        object.position.addSelf( offset );
+
+                    }
+
+                }
+
+                updateHash();
+                interact();
+                render();
+
+            }
+
+            function offsetScene( moveDir , amount, doRender) {
                 var nX = camera.position.x - camera.target.position.x,
                     nZ = camera.position.z - camera.target.position.z,
 
                     absX = Math.abs(nX),
                     absZ = Math.abs(nZ),
                     totalChange = absX + absZ,
-                    changeX = absX/totalChange,
-                    changeZ = absZ/totalChange;
+                    changeX = (absX/totalChange)*amount,
+                    changeZ = (absZ/totalChange)*amount;
 
                 switch(moveDir){
                     case 0:
@@ -647,14 +708,15 @@ document.oncontextmenu=new Function("return false")
                         break;
                 }
                 
-                camera.target.position.x = camera.target.position.x+(dx*50);
-                camera.target.position.z = camera.target.position.z+(dz*50);
-                camera.position.x = camera.position.x + (dx * 50)
-                camera.position.z = camera.position.z + (dz * 50)
-                
-                camera.updateMatrix();
-                interact();
-                render();
+                camera.target.position.x = camera.target.position.x+(dx);
+                camera.target.position.z = camera.target.position.z+(dz);
+                camera.position.x = camera.position.x + (dx);
+                camera.position.z = camera.position.z + (dz);
+                if( doRender ){
+                    camera.updateMatrix();
+                    interact();
+                    render();
+                }
 
             }
 
@@ -723,8 +785,20 @@ document.oncontextmenu=new Function("return false")
             }
 
             function render() {
-
                 renderer.render( scene, camera );
+                stats = getStats();
+                document.getElementById('maxW').innerHTML = stats.maxW;
+                document.getElementById('maxH').innerHTML = stats.maxH;
+                document.getElementById('maxL').innerHTML = stats.maxL;
+                document.getElementById('count1').innerHTML = stats.counts[1];
+                document.getElementById('count2').innerHTML = stats.counts[2];
+                document.getElementById('count3').innerHTML = stats.counts[3];
+                document.getElementById('count4').innerHTML = stats.counts[4];
+                document.getElementById('count5').innerHTML = stats.counts[5];
+                document.getElementById('count6').innerHTML = stats.counts[6];
+                document.getElementById('count7').innerHTML = stats.counts[7];
+                document.getElementById('count8').innerHTML = stats.counts[8];
+                document.getElementById('count9').innerHTML = stats.counts[9];
 
             }
 
@@ -747,11 +821,11 @@ document.oncontextmenu=new Function("return false")
                     object = scene.objects[ i ];
 
                     if ( object instanceof THREE.Mesh && object !== plane && object !== brush ) {
-                        current.x = ( object.position.x/50 ) + 19.5
-                        current.y = ( object.position.z/50 ) + 19.5
-                        current.z = ( object.position.y/50 ) + 0.5
+                        current.x = 39 - ( ( object.position.x/50 ) + 19.5 );
+                        current.y = ( object.position.z/50 ) + 19.5;
+                        current.z = ( object.position.y/50 ) + 0.5;
                         current.c = colors.indexOf( object.material[ 0 ].color.hex & 0xffffff );
-                        blocks[current.x][current.y][current.z] = current.c
+                        blocks[current.x][current.y][current.z] = current.c;
 
                     }
 
@@ -815,6 +889,8 @@ document.oncontextmenu=new Function("return false")
                 });
             }
 
+            var lastStoreName = "";
+
             function localStore(){
                 var show = document.createElement( 'div' );
                 show.style.height = "100%";
@@ -822,6 +898,7 @@ document.oncontextmenu=new Function("return false")
                 show.style.textAlign = "center";
                 var saveInput = document.createElement('input');
                 saveInput.type = "text";
+                saveInput.value = lastStoreName;
                 var saveButton = document.createElement('button');
                 saveButton.innerHTML ="Save";
 
@@ -830,7 +907,10 @@ document.oncontextmenu=new Function("return false")
                     if(localStorage.getItem(saveInput.value)){
                         con = confirm("This will overwite the current save file. Continue?");
                     }
-                    if(con) localStorage.setItem(saveInput.value,updateHash());
+                    if(con){
+                        localStorage.setItem(saveInput.value,updateHash());
+                        lastStoreName = saveInput.value;
+                    }
                 });
 
                 var existingList = document.createElement( 'select' );
@@ -845,6 +925,7 @@ document.oncontextmenu=new Function("return false")
 
                 loadButton.addEventListener('click',function(){
                     buildFromHash(localStorage.getItem(existingList.value));
+                    lastStoreName = existingList.value;
                 });
 
                 var removeButton = document.createElement('button');
@@ -908,6 +989,44 @@ document.oncontextmenu=new Function("return false")
 
                 render();
 
+            }
+
+            function getStats(){
+                var stats = {
+                    maxW:0,
+                    maxL:0,
+                    maxH:0,
+                    counts:{
+                        1:0,
+                        2:0,
+                        3:0,
+                        4:0,
+                        5:0,
+                        6:0,
+                        7:0,
+                        8:0,
+                        9:0,
+
+                    }
+                }
+
+                var i = 0;
+                while ( i < scene.objects.length ) {
+
+                    object = scene.objects[ i ];
+
+                    if ( object instanceof THREE.Mesh && object !== plane && object !== brush ) {
+                        if( object.position.x , object.position.y , object.position.z ){
+                            stats.maxW = Math.max(39 - ( ( object.position.x/50 ) + 19.5 ),stats.maxW);
+                            stats.maxL = Math.max(( object.position.z/50 ) + 19.5,stats.maxL);
+                            stats.maxH = Math.max(( object.position.y/50 ) + 0.5,stats.maxH);
+                            stats.counts[colors.indexOf( object.material[ 0 ].color.hex & 0xffffff )]++;
+                        }
+                    }
+
+                    i++;
+                }
+                return stats;
             }
 
             // https://gist.github.com/665235
