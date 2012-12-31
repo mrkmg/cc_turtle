@@ -224,9 +224,9 @@ end
 function TGM:refuel()
     if turtle.getFuelLevel() == 0 then
         while turtle.getItemCount(16) == 0 do
-	        clearScreen()
-	        print("Waiting for fuel, press enter when ready")
-	        read()
+            clearScreen()
+            print("Waiting for fuel, press enter when ready")
+            read()
         end
         turtle.select(16)
         turtle.refuel(1)
@@ -298,8 +298,9 @@ dig = Dig.init()
 
 
 local l = 1
-local w = 2
+local w = 1
 local h = 1
+local hDone = 1;
 while l <= length do
     h = 2
     while h <= height do
@@ -315,14 +316,27 @@ while l <= length do
                 dig:forward()
             end
             bot:moveTo(w,l,h)
-            dig:down()
-            if h - 1 <= height then
+            if h - 1 > hDone then
+                dig:down()
+            end
+            if h - 1 < height then
                 dig:up()
             end
             placeTorch(w,l,h)
             w = w + 1
         end
-        h = h + 2
+
+        if h - 1 < height then
+            hDone = h + 1
+        else
+            hDone = h
+        end
+
+        if h + 2 <= height then
+            h = h + 2
+        else
+            h = h + 1
+        end
     end
     print(l)
     l = l + 1
