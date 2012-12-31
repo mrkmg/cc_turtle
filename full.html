@@ -164,7 +164,7 @@ document.oncontextmenu=new Function("return false")
             projector, plane, cube, linesMaterial,
             color = 1,colors = [ null, 0xD9D9D9, 0x303030, 0x80DF1F, 0x1FDF50, 0x1FDFDF, 0x1F4FDF, 0x7F1FDF, 0xDF1FAF, 0xDF1F1F ],
             ray, brush, objectHovered,
-            mouse3D, isMouseDown = false, onMouseDownPosition,
+            mouse3D, isMouseDown = false, onMouseDownPosition, startMouseDown,
             radious = 3200, theta = 360, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
             isShiftDown = false,
             width = 50,
@@ -260,6 +260,7 @@ document.oncontextmenu=new Function("return false")
                 scene.addObject( brush );
 
                 onMouseDownPosition = new THREE.Vector2();
+                startMouseDown = new THREE.Vector2();
 
                 // Lights
 
@@ -354,6 +355,8 @@ document.oncontextmenu=new Function("return false")
                 onMouseDownPhi = phi;
                 onMouseDownPosition.x = event.clientX;
                 onMouseDownPosition.y = event.clientY;
+                startMouseDown.x = event.clientX;
+                startMouseDown.y = event.clientY;
 
                 return false;
 
@@ -408,8 +411,8 @@ document.oncontextmenu=new Function("return false")
                 clearTimeout(timeout);
                 isMouseDown = false;
 
-                onMouseDownPosition.x = event.clientX - onMouseDownPosition.x;
-                onMouseDownPosition.y = event.clientY - onMouseDownPosition.y;
+                onMouseDownPosition.x = event.clientX - startMouseDown.x;
+                onMouseDownPosition.y = event.clientY - startMouseDown.y;
 
                 if ( onMouseDownPosition.length() > 5 ) {
 
@@ -859,6 +862,8 @@ document.oncontextmenu=new Function("return false")
                 }
 
                 string = fixStringUp(string);
+                string += "\n\n"+"-";
+
                 var show = document.createElement( 'textarea' );
                 container.style.display = "none";
                 document.body.appendChild(show);
