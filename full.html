@@ -167,9 +167,9 @@ document.oncontextmenu=new Function("return false")
             mouse3D, isMouseDown = false, onMouseDownPosition, startMouseDown,
             radious = 3200, theta = 360, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
             isShiftDown = false,
-            width = 50,
-            length = 50,
-            height = 50;
+            width = 500,
+            length = 500,
+            height = 500;
 
             setTimeout(function(){
             init();
@@ -235,11 +235,11 @@ document.oncontextmenu=new Function("return false")
                 for ( var i = 0; i <= 40; i ++ ) {
 
                     var line = new THREE.Line( geometry, linesMaterial );
-                    line.position.z = ( i * 50 ) - 1000;
+                    line.position.z = ( i * width ) - 1000;
                     scene.addObject( line );
 
                     var line = new THREE.Line( geometry, linesMaterial );
-                    line.position.x = ( i * 50 ) - 1000; line.rotation.y = 90
+                    line.position.x = ( i * length ) - 1000; line.rotation.y = 90
                     * Math.PI / 180; scene.addObject( line );
 
                 }
@@ -250,7 +250,7 @@ document.oncontextmenu=new Function("return false")
                 plane.rotation.x = - 90 * Math.PI / 180;
                 scene.addObject( plane );
 
-                cube = new Cube( 50, 50, 50 );
+                cube = new Cube( width, length, height );
 
                 ray = new THREE.Ray( camera.position, null );
 
@@ -808,11 +808,11 @@ document.oncontextmenu=new Function("return false")
             function save() {
                 var i = 0;
                 var blocks = [];
-                for(var x = 0;x < 40;x++){
+                for(var x = 0;x < width;x++){
                     blocks[x] = [];
-                    for(var y = 0;y < 40;y++){
+                    for(var y = 0;y < length;y++){
                         blocks[x][y] = [];
-                        for(var z = 1;z < 41;z++){
+                        for(var z = 1;z < height+1;z++){
                             blocks[x][y][z] = ' ';
                         }
                     }
