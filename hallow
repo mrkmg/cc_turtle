@@ -11,7 +11,7 @@ function loadKLIB(file)
         file.close()
         return true
     end
-    dofile(name)
+    dofile(file)
 end
 
 function placeTorch(x,y,z)
@@ -55,9 +55,9 @@ height = askNumber("Height?")
 length = askNumber("Length")
 
 print("Loading Lib: TGM")
-loadKLIB('TGM')
+loadKLIB("TGM")
 print("Loading Lib: Dig")
-loadKLIB('Dig')
+loadKLIB("Dig")
 
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
