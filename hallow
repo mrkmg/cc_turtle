@@ -2,10 +2,10 @@
 -- Version 1
 
 function loadLib(name)
-    if fs.exists(file) == false then
+    if fs.exists(name) == false then
         local data = http.get(getLink("https://raw.github.com/mrkmg/cc_turtle/master/klib/" .. name))
         if data then
-            local file = fs.open(file,"w")
+            local file = fs.open(name,"w")
             file.write(data.readAll())
             file.close()
             return true
