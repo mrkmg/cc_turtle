@@ -1,7 +1,7 @@
 -- hallow by MrKMG
 -- Version 1
 
-function loadLib(name){
+function loadLib(name)
     if fs.exists(file) == false then
         local data = http.get(getLink("https://raw.github.com/mrkmg/cc_turtle/master/klib/" .. name))
         if data then
@@ -12,7 +12,7 @@ function loadLib(name){
         end
     end
     dofile(name)
-}
+end
 
 function placeTorch(x,y,z)
     if turtle.getItemCount(15) > 0 then
