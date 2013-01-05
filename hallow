@@ -302,7 +302,7 @@ local h = 1
 local hDone = 0;
 while l <= length do
     h = 2
-    while h <= height do
+    while hDone <= height do
         w = 1
         while w <= width do
             if w == 1 and w ~= width then
