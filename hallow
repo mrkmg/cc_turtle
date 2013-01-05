@@ -1,7 +1,7 @@
 -- hallow by MrKMG
 -- Version 1
 
-function loadLib(file)
+function loadKLIB(file)
     print("Downloading, " .. file)
     local data = http.get("https://raw.github.com/mrkmg/cc_turtle/master/klib/" .. file)
     if data then
@@ -55,9 +55,9 @@ height = askNumber("Height?")
 length = askNumber("Length")
 
 print("Loading Lib: TGM")
-loadLib('TGM')
+loadKLIB('TGM')
 print("Loading Lib: Dig")
-loadLib('Dig')
+loadKLIB('Dig')
 
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
