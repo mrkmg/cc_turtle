@@ -172,7 +172,7 @@ function TGM:refuel()
     if turtle.getFuelLevel() == 0 then
         while turtle.getItemCount(16) == 0 do
             term.clear()
-            term.setPos(1,1)
+            print()
             print("Waiting for fuel, press enter when ready")
             read()
         end
