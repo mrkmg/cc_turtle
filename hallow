@@ -333,7 +333,7 @@ while l <= length do
 
         if h + 2 <= height then
             h = h + 2
-        else
+        elseif h + 1 <= height then
             h = h + 1
         end
     end
