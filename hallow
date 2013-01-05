@@ -325,15 +325,15 @@ while l <= length do
             w = w + 1
         end
 
-        if h - 1 < height then
+        if h <= height - 1 then
             hDone = h + 1
         else
             hDone = h
         end
 
-        if h + 2 < height then
+        if h + 2 <= height then
             h = h + 2
-        elseif h + 1 < height then
+        elseif h + 1 <= height then
             h = h + 1
         end
     end
