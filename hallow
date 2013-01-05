@@ -11,7 +11,7 @@ function loadKLIB(file)
         file.close()
         return true
     end
-    require file
+    require(file)
 end
 
 function placeTorch(x,y,z)
