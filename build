@@ -485,7 +485,7 @@ function main()
             layer[y] = {}
             for x = 1, len do
                 item = tonumber(line:sub(x,x))
-                if item == nil or item == 0 then
+                if item == nil or item == 0 or item > num_mats then
                     layer[y][x] = 0
                 else
                     layer[y][x] = item
@@ -520,7 +520,7 @@ num_mats = askNumber("Number of materials?",9)
 
 if fs.exists("rom/build/"..template) then
     template = "rom/build/"..template
-else
+elseif 
     if fs.exists(template) == false then
         download(template)
     end
