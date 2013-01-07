@@ -300,6 +300,8 @@ document.oncontextmenu=new Function("return false")
 
             }
 
+            var fillModDown = false;
+
             function onDocumentKeyDown( event ) {
 
                 switch( event.keyCode ) {
@@ -327,6 +329,8 @@ document.oncontextmenu=new Function("return false")
                     case 84: toggleTrans(); break;
                     case 69: isShiftDown = isShiftDown?false:true; break;
 
+                    case 70: fillModDown = true; break;
+
                 }
 
             }
@@ -337,12 +341,16 @@ document.oncontextmenu=new Function("return false")
 
                     case 16: isShiftDown = false; interact(); render(); break;
 
+                    case 70: fillModDown = false; break;
+
                 }
 
             }
 
             mouseButton = 1;
-            timeout = null
+            timeout = null;
+            fillPos1 = false;
+
             function onDocumentMouseDown( event ) {
 
                 event.preventDefault();
@@ -439,17 +447,32 @@ document.oncontextmenu=new Function("return false")
 
                             }
 
+                        } else if(fillModDown) {
+                            if(fillPos1 == false){
+                                fillPos1 = getXYZFromIntersect(intersect);
+                            } else {
+                                var fillPos2 = getXYZFromIntersect(intersect);
+                                var x1  = fillPos1[0]>fillPos2[0]?fillPos2[0]:fillPos1[0];
+                                var x2  = fillPos1[0]>fillPos2[0]?fillPos1[0]:fillPos2[0];
+
+                                var y1  = fillPos1[1]>fillPos2[1]?fillPos2[1]:fillPos1[1];
+                                var y2  = fillPos1[1]>fillPos2[1]?fillPos1[1]:fillPos2[1];
+
+                                var z1  = fillPos1[2]>fillPos2[2]?fillPos2[2]:fillPos1[2];
+                                var z2  = fillPos1[2]>fillPos2[2]?fillPos1[2]:fillPos2[2];
+                                console.log(x1,x2,y1,y2,z1,z2);
+                                for(var x = x1; x <= x2;x+=50){
+                                    for(var y = y1; y <= y2;y+=50){
+                                        for(var z = z1; z <= z2;z+=50){
+                                            placeBlock(x,y,z)
+                                        }
+                                    }
+                                }
+                                fillPos1 = false;
+                            }
                         } else {
-
-                            var position = new THREE.Vector3().add( intersect.point, intersect.object.matrixRotation.transform( intersect.face.normal.clone() ) );
-
-                            var voxel = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( colors[ color ], blockOpacity ) );
-                            voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
-                            voxel.position.y = Math.floor( position.y / 50 ) * 50 + 25;
-                            voxel.position.z = Math.floor( position.z / 50 ) * 50 + 25;
-                            voxel.overdraw = true;
-                            scene.addObject( voxel );
-
+                            var xyz = getXYZFromIntersect(intersect);
+                            placeBlock(xyz[0],xyz[1],xyz[2]);
                         }
 
                     }
@@ -462,7 +485,6 @@ document.oncontextmenu=new Function("return false")
 
                 interact();
                 render();
-
             }
 
             function onDocumentMouseWheel( event ) {
@@ -476,6 +498,25 @@ document.oncontextmenu=new Function("return false")
 
                 interact();
                 render();
+            }
+
+            function placeBlock(x,y,z){
+                var voxel = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( colors[ color ], blockOpacity ) );
+                voxel.position.x = x;
+                voxel.position.y = y;
+                voxel.position.z = z;
+                voxel.overdraw = true;
+                scene.addObject( voxel );
+            }
+
+            function getXYZFromIntersect(intersect){
+                var position = new THREE.Vector3().add( intersect.point, intersect.object.matrixRotation.transform( intersect.face.normal.clone() ) );
+
+                var x = Math.floor( position.x / 50 ) * 50 + 25;
+                var y = Math.floor( position.y / 50 ) * 50 + 25;
+                var z = Math.floor( position.z / 50 ) * 50 + 25;
+
+                return [x,y,z];
 
             }
 
