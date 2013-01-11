@@ -21,16 +21,18 @@ end
 
 function cutTree()
   turtle.dig()
+  refuel()
   turtle.forward()
   while turtle.detectUp() do
     turtle.digUp()
-    turtle.up()
     refuel()
+    turtle.up()
   end
   while not turtle.detectDown() do
-    turtle.down()
     refuel()
+    turtle.down()
   end
+  refuel()
   turtle.back()
 end
 
