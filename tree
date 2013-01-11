@@ -1,0 +1,45 @@
+function refuel()
+    if turtle.getFuelLevel() == 0 then
+        while turtle.getItemCount(16) == 0 do
+            clearScreen()
+            print("Waiting for fuel, press enter when ready")
+            read()
+        end
+        turtle.select(16)
+        turtle.refuel(1)
+        return true
+    end
+    return true
+end
+
+function makeTree()
+  turtle.select(1)
+  turtle.place()
+  turtle.select(2)
+  turtle.place()
+end
+
+function cutTree()
+  turtle.dig()
+  turtle.forward()
+  while turtle.detectUp() do
+    turtle.digUp()
+    turtle.up()
+  end
+  while not turtle.detectDown() do
+    turtle.down()
+  end
+  turtle.back()
+end
+
+function depositWood()
+  turtle.select(3)
+  turtle.dropDown()
+end
+
+for i = 1, 64 do 
+  refuel(); 
+  makeTree()
+  cutTree()
+  depositWood()
+end
