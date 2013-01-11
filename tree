@@ -37,7 +37,7 @@ function depositWood()
   turtle.dropDown()
 end
 
-for i = 1, 64 do 
+while turtle.getItemCount(1) > 0 and turtle.getitemCount(2) > 0 do
   refuel(); 
   makeTree()
   cutTree()
