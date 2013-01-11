@@ -520,7 +520,7 @@ num_mats = askNumber("Number of materials?",9)
 
 if fs.exists("rom/build/"..template) then
     template = "rom/build/"..template
-elseif 
+elseif then
     if fs.exists(template) == false then
         download(template)
     end
