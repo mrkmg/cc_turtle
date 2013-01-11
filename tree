@@ -25,9 +25,11 @@ function cutTree()
   while turtle.detectUp() do
     turtle.digUp()
     turtle.up()
+    refuel()
   end
   while not turtle.detectDown() do
     turtle.down()
+    refuel()
   end
   turtle.back()
 end
@@ -38,7 +40,6 @@ function depositWood()
 end
 
 while turtle.getItemCount(1) > 0 and turtle.getItemCount(2) > 0 do
-  refuel(); 
   makeTree()
   cutTree()
   depositWood()
