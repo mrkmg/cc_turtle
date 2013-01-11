@@ -374,27 +374,53 @@ function download(file)
     end
 end
 
-function checkAndRefillSlot(slot)
-    if turtle.getItemCount(slot) == 0 then
-        local returnX = bot:getX()
-        local returnY = bot:getY()
-        local returnZ = bot:getZ()
-        local returnD = bot:getD()
-        local box = boxes[slot]
-
-        bot:moveTo(box.x,box.y,box.z+1)
-        turtle.select(slot)
-        while turtle.suckDown() == false do
-            print("Please refill crate " .. slot .. " and press enter.")
-            read()
+function getSlotForItem(item)
+    local cSlot = item
+    local good = false
+    while cSlot < 16 and good == false do
+        if turtle.getItemCount(slot) == 0 then
+            cSlot = cSlot + num_mats
+        else
+            good = true;
         end
-        bot:moveToReverse(returnX,returnY,returnZ)
-        bot:rotateTo(returnD)
+    end
+    if good == true then
+        return cSlot
+    else
+        return 0
     end
 end
 
-function placeDown(slot)
-    checkAndRefillSlot(slot)
+function refillItem(item)
+    local returnX = bot:getX()
+    local returnY = bot:getY()
+    local returnZ = bot:getZ()
+    local returnD = bot:getD()
+    local box = boxes[item]
+    local pickedUpSome = false
+
+    while cSlot < 16 do
+        if turtle.getItemCount(cSlot) == 0 then
+            bot:moveTo(box.x,box.y,box.z+1)
+            turtle.select(cSlot)
+            while pickedUpSome == false and turtle.suckDown() == false do
+                print("Please refill crate " .. item .. " and press enter.")
+                read()
+            end
+            pickedUpSome = true;
+        end
+        cSlot = cSlot + num_mats
+    end
+    bot:moveToReverse(returnX,returnY,returnZ)
+    bot:rotateTo(returnD)
+end
+
+function placeDown(item)
+    local slot = getSlotForItem(item)
+    if slot == 0 then 
+        refillItem(item)
+        slot = getSlotForItem(item)
+    end
     turtle.select(slot)
     turtle.placeDown()
 end
