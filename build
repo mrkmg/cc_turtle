@@ -520,11 +520,10 @@ num_mats = askNumber("Number of materials?",9)
 
 if fs.exists("rom/build/"..template) then
     template = "rom/build/"..template
-elseif then
-    if fs.exists(template) == false then
-        download(template)
-    end
+elseif fs.exists(template) == false then
+    download(template)
 end
+
 if fs.exists(template) then
     bot = TGM.init(1,0,1,0)
     main()
