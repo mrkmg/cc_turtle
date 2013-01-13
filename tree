@@ -23,6 +23,15 @@ function makeTree()
     turtle.turnRight()
   end
   turtle.place()
+  turtle.select(2)
+  if turtle.getItemCount(2) == 0 then
+    turtle.turnRight()
+    turtle.suck()
+    turtle.turnLeft()
+  end
+  if turtle.getitemCount(2) > 0 then
+    turtle.place()
+  end
 end
 
 function detectTree()
