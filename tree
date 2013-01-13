@@ -29,8 +29,7 @@ function makeTree()
     turtle.suck()
     turtle.turnLeft()
   end
-  if turtle.getI
-  temCount(2) > 0 then
+  if turtle.getItemCount(2) > 0 then
     turtle.place()
   end
 end
