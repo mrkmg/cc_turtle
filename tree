@@ -14,7 +14,7 @@ end
 
 function makeTree()
   turtle.select(1)
-  while turtle.getItemCount(1) == 0 then
+  while turtle.getItemCount(1) == 0 do
     turtle.suckUp()
     sleep(1)
   end
