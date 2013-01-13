@@ -17,7 +17,7 @@ function makeTree()
   if turtle.getItemCount(1) == 0 then
     turtle.turnLeft()
     while turtle.getItemCount(1) == 0 do
-      turtle.suckUp()
+      turtle.suck()
       sleep(1)
     end
     turtle.turnRight()
