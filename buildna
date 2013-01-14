@@ -551,7 +551,7 @@ function runPlan(plan,z)
             end
         end
         if iSlot > 0 then
-            log.writeLine("placing "..$iSlot.." at "..current.x.." "..current.y)
+            log.writeLine("placing "..iSlot.." at "..current.x.." "..current.y)
             -- if placeDown(current.b) == false
             --     print("Critical Error: Could not place block");
             --     print("==More info on how to fix this in later a version==")
