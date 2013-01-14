@@ -481,6 +481,7 @@ function pickupMatsForPlan(plan,currentI)
     local cSlot = 0
     local dSlot = 0
     local dType = 0
+    log.writeLine('Refilling bot')
     while con == true do
         cSlot = 1
         dSlot = 0
@@ -503,18 +504,19 @@ function pickupMatsForPlan(plan,currentI)
     end
 
 
-    local returnX = bot:getX()
-    local returnY = bot:getY()
-    local returnZ = bot:getZ()
-    local returnD = bot:getD()
+    -- local returnX = bot:getX()
+    -- local returnY = bot:getY()
+    -- local returnZ = bot:getZ()
+    -- local returnD = bot:getD()
     
     for ai = 1, 15 do
         if map[ai] > 0 then
-            refillTo(map[ai],i,slots[ai])
-            if ai < 15 and turtle.getItemCount(ai+1) > 0 then
-                turtle.select(ai+1)
-                turtle.dropDown()
-            end
+            log.writeLine("--- filling slot "..ai.." with "..slots[ai].." of "..map[ai])
+            -- refillTo(map[ai],i,slots[ai])
+            -- if ai < 15 and turtle.getItemCount(ai+1) > 0 then
+            --     turtle.select(ai+1)
+            --     turtle.dropDown()
+            -- end
         end
     end
 
@@ -530,9 +532,10 @@ end
 function runPlan(plan,z)
     local current
     local buildHeight = z + 1
-    bot:moveTo(bot:getX(),bot:getY(),buildHeight)
+    --bot:moveTo(bot:getX(),bot:getY(),buildHeight)
     local filledTo = 0
     local itemStuff, slots, map, iSlot
+    log.writeLine('Starting Run of Layer '..z)
     for i=1, table.maxn(plan) do
         iSlot = 0
         if filledTo < i then
@@ -542,18 +545,19 @@ function runPlan(plan,z)
             filledTo = itemStuff.maxI
         end
         current = plan[i]
-        bot:moveTo(current.x,current.y,buildHeight)
+        --bot:moveTo(current.x,current.y,buildHeight)
         for ii=1, 15 do
             if map[ii] == current.b and slot[ii] > 0 then
                 iSlot = 0
             end
         end
         if iSlot > 0 then
-            if placeDown(current.b) == false
-                print("Critical Error: Could not place block");
-                print("==More info on how to fix this in later a version==")
-                sleep(500)
-            end
+            log.writeLine("placing "..$iSlot.." at "..current.x.." "..current.y)
+            -- if placeDown(current.b) == false
+            --     print("Critical Error: Could not place block");
+            --     print("==More info on how to fix this in later a version==")
+            --     sleep(500)
+            -- end
         else
             print("Critical Error: There should have been an item to place, something is wrong")
             print("==More info on how to fix this in later a version==")
@@ -564,6 +568,8 @@ function runPlan(plan,z)
         global_ticker = global_ticker + 1
     end
 end
+
+
 
 
 function main()
@@ -627,6 +633,7 @@ end
 
 if fs.exists(template) then
     bot = TGM.init(1,0,1,0)
+    log = fs.open('bulog')
     main()
 else
     clearScreen()
