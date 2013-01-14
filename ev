@@ -27,7 +27,7 @@ direction = { FORWARD=0, RIGHT=1, BACK=2, LEFT=3, UP=4, DOWN=5 }
 local messageOutputLevel = messageLevel.INFO
 local messageOutputFileName
 local fuelLevelToRefuelAt = 5
-local refuelItemsToUseWhenRefuelling = 63
+local refuelItemsToUseWhenRefuelling = 1
 local emergencyFuelToRetain = 0
 local maximumGravelStackSupported = 25 -- The number of stacked gravel or sand blocks supported
 local noiseBlocksCount

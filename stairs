@@ -1,4 +1,4 @@
--- hallow by MrKMG
+-- Stairs by MrKMG
 -- Version 1
 
 --TGM Def
@@ -240,7 +240,7 @@ end
 
 function clearScreen()
     term.clear()
-    writeAt("Hallow",5,1)
+    writeAt("Stairs",5,1)
     term.setCursorPos( 1, 3 )
 end
 
@@ -353,95 +353,35 @@ function askNumber(question)
 end
 
 
-width = askNumber("Width?")
-height = askNumber("Height?")
-length = askNumber("Length")
+depth = askNumber("Depth?")
 
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
 
-
-local currentL = 1
-local currentW = 1
-local currentH = 1
-local hDone = 0
-local digDown = false
-local digUp = false
+local destL = depth * 2
+local dX = 0
+local dY = 0
+local dZ = 0
 
 
-while currentL <= length do
-    hDone = 0
-    while hDone < height do
-        if height - hDone == 1 then
-            digDown = false
-            digUp = false
-            currentH =  hDone + 1
-        elseif height - hDone == 2 then
-            digDown = false
-            digUp = true
-            currentH = hDone + 1
-        elseif height -hDone > 2 then
-            digDown = true
-            digUp = true
-            currentH = hDone + 2
-        end
-
-        if currentW == 1 then
-            for currentW = 1, width do
-                if currentW == 1 then
-                    dig:up()
-                    bot:up()
-                    if digDown then 
-                        dig:up()
-                        bot:up()
-                    end
-                else
-                    bot:moveTo(currentW-1,currentL,currentH)
-                    bot:rotateTo(1)
-                    dig:forward()
-                    bot:moveTo(currentW,currentL,currentH)
-                end
-                if digUp then 
-                    dig:up() 
-                end
-                if digDown then 
-                    dig:down() 
-                end
-            end
-            currentW = width
-        else
-            currentW = width
-            while currentW > 0 do
-                if currentW == width then
-                    dig:up()
-                    bot:up()
-                    if digDown then 
-                        dig:up()
-                        bot:up()
-                    end
-                else
-                    bot:moveTo(currentW+1,currentL,currentH)
-                    bot:rotateTo(3)
-                    dig:forward()
-                    bot:moveTo(currentW,currentL,currentH)
-                end
-                if digUp then 
-                    dig:up() 
-                end
-                if digDown then 
-                    dig:down() 
-                end
-                currentW = currentW - 1
-            end
-            currentW = 1
-        end
-        
-        if digUp then hDone = currentH + 1
-        else hDone = currentH end
-        checkItemsAndEmpty()
+for currentL = 1, destL do
+    dY = currentL
+    dZ = currentL
+    if ( dZ % 2 )  == 1 then
+        dZ = dZ + 1
     end
-    currentL = currentL + 1
-end
+    dZ = 2 - (dZ / 2)
 
-bot:moveTo(1,0,1)
-bot:rotateTo(0)
+    bot:gotoX(1)
+    bot:gotoY(dY - 1)
+    bot:gotoZ(dZ)
+    dig:foward()
+    bot:gotoY(dy)
+    dig:up()
+    dig:down()
+    bot:rotateTo(1)
+    dig:foward()
+    bot:forward()
+    dig:up()
+    dig:down()
+end
