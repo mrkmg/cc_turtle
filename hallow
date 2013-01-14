@@ -12,6 +12,7 @@ function TGM.init(x,y,z,d)
     grid.y = y or 1
     grid.z = z or 1
     grid.d = d or 0
+    grid.checkFuel = true
     return grid
 end
 
@@ -27,7 +28,7 @@ end
 
 
 function TGM:forward()
-    self:refuel()
+    if self.checkFuel then self:refuel() end
     if turtle.forward() then
         if     self:getD() == 0 then self.y = self.y + 1
         elseif self:getD() == 1 then self.x = self.x + 1
@@ -42,7 +43,7 @@ function TGM:forward()
 end
 
 function TGM:back()
-    self:refuel()
+    if self.checkFuel then self:refuel() end
     if turtle.back() then
         if     self:getD() == 0 then self.y = self.y - 1
         elseif self:getD() == 1 then self.x = self.x - 1
@@ -57,7 +58,7 @@ function TGM:back()
 end
 
 function TGM:up()
-    self:refuel()
+    if self.checkFuel then self:refuel() end
     if turtle.up() then
         self.z = self.z + 1
         return true
@@ -67,7 +68,7 @@ function TGM:up()
 end
 
 function TGM:down()
-    self:refuel()
+    if self.checkFuel then self:refuel() end
     if turtle.down() then
         self.z = self.z - 1
     else
@@ -117,8 +118,8 @@ function TGM:rotateTo(d)
 end
 
 function TGM:moveTo(x,y,z)
+    -- X
     if self:getX() ~= x then
-        -- X
         if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
         while self:getX() < x do
             sleep(0.1)
@@ -168,13 +169,78 @@ function TGM:moveTo(x,y,z)
     end
 end
 
+function TGM:moveToReverse(x,y,z)
+    -- Z
+    while self:getZ() < z do
+        self:up()
+        sleep(0.1)
+    end
+    while self:getZ() > z do
+        sleep(0.1)
+        self:down()
+    end
+    -- Y
+    if self:getY() ~= y then
+        if self:getD() == 1 or self:getD() == 3 then self:rotateTo(0) end
+        while self:getY() < y do
+            sleep(0.1)
+            if self:getD() == 0 then
+                self:forward()
+            else 
+                self:back()
+            end
+        end
+        while self:getY() > y do
+            sleep(0.1)
+            if self:getD() == 0 then
+                self:back()
+            else 
+                self:forward()
+            end
+        end
+    end
+    -- X
+    if self:getX() ~= x then
+        if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
+        while self:getX() < x do
+            sleep(0.1)
+            if self:getD() == 1 then
+                self:forward()
+            else 
+                self:back()
+            end
+        end
+        while self:getX() > x do
+            sleep(0.1)
+            if self:getD() == 1 then
+                self:back()
+            else 
+                self:forward()
+            end
+        end
+    end
+end
+
 function TGM:refuel()
     if turtle.getFuelLevel() == 0 then
-        while turtle.getItemCount(16) == 0 do
-            term.clear()
-            print()
-            print("Waiting for fuel, press enter when ready")
-            read()
+        if (turtle.getItemCount(16)-1) * 80 < self:getZ() + self:getY() + self:getZ() then
+            turtle.select(16)
+            turtle.refuel()
+            self.checkFuel = false
+            sleep(0.1)
+            local returnX = self:getX()
+            local returnY = self:getY()
+            local returnZ = self:getZ()
+            local returnD = self:getD()
+            self:moveToReverse(1,0,1)
+            while turtle.getItemCount(16) == 0 do
+                clearScreen()
+                print("Waiting for fuel, press enter when ready")
+                read()
+            end
+            self:moveToReverse(returnX,returnY,returnZ)
+            self:rotateTo(returnD)
+            self.checkFuel = true
         end
         turtle.select(16)
         turtle.refuel(1)
@@ -199,14 +265,24 @@ function TGM:getD()
     return self.d
 end
 
+function writeAt(string, columnVar, rowVar)
+    term.setCursorPos( columnVar, rowVar )
+    write(string)
+end
+
+function clearScreen()
+    term.clear()
+    writeAt("Hallow",5,1)
+    term.setCursorPos( 1, 3 )
+end
+
 Dig = {}
 Dig.__index = Dig
 
 function Dig.init()
-    local dig = {}
-    setmetatable(dig,Dig)
-    dig.collectBlocks = true
-    return dig
+    local digitem = {}
+    setmetatable(digitem,Dig)
+    return digitem
 end
 
 function Dig:forward()
@@ -251,10 +327,35 @@ function Dig:down()
     end
 end
 
+function checkItemsAndEmpty()
+    local c
+    local goEmpty = true
+    for c = 1, 14 do
+        if goEmpty and turtle.getItemCount(c) == 0 then
+            goEmpty = false
+        end
+    end
+
+    if goEmpty then
+        local returnX = bot:getX()
+        local returnY = bot:getY()
+        local returnZ = bot:getZ()
+        local returnD = bot:getD()
+        bot:moveTo(1,0,1)
+        bot:rotateTo(1)
+        for c = 1, 14 do
+            turtle.select(c)
+            turtle.drop()
+        end
+        bot:moveToReverse(returnX,returnY,returnZ)
+        bot:rotateTo(returnD)
+    end
+end
+
 
 function placeTorch(x,y,z)
     if turtle.getItemCount(15) > 0 then
-        if ( x % 5 ) == 3 and ( y % 5) == 1 and ( z ) == 2 then
+        if ( x % 5 ) == 1 and ( y % 5) == 1 and ( z ) == 2 then
             turtle.select(15)
             turtle.placeDown()
             turtle.select(1)
@@ -262,15 +363,11 @@ function placeTorch(x,y,z)
     end
 end
 
-function clearScreen()
-    term.clear()
-end
-
 function askNumber(question)
     local ans
     local cont = true
     clearScreen()
-    while cont == true do -- Width Question
+    while cont == true do 
         print(question)
         ans = tonumber(read())
         clearScreen()
@@ -296,50 +393,86 @@ bot = TGM.init(1,0,1,0)
 dig = Dig.init()
 
 
-local l = 1
-local w = 1
-local h = 1
-local hDone = 0;
-while l <= length do
-    h = 2
-    hDone = 0;
+local currentL = 1
+local currentW = 1
+local currentH = 1
+local hDone = 0
+local digDown = false
+local digUp = false
+
+
+while currentL <= length do
+    hDone = 0
     while hDone < height do
-        w = 1
-        while w <= width do
-            if w == 1 and w ~= width then
-                bot:moveTo(w,l-1,h)
-                bot:rotateTo(0)
-                dig:forward()
-            else
-                bot:moveTo(w-1,l,h)
-                bot:rotateTo(1)
-                dig:forward()
-            end
-            bot:moveTo(w,l,h)
-            if h - 1 > hDone then
-                dig:down()
-            end
-            if h - 1 < height then
-                dig:up()
-            end
-            placeTorch(w,l,h)
-            w = w + 1
+        if height - hDone == 1 then
+            digDown = false
+            digUp = false
+            currentH =  hDone + 1
+        elseif height - hDone == 2 then
+            digDown = false
+            digUp = true
+            currentH = hDone + 1
+        elseif height -hDone > 2 then
+            digDown = true
+            digUp = true
+            currentH = hDone + 2
         end
 
-        if h <= height - 1 then
-            hDone = h + 1
+        if currentW == 1 then
+            for currentW = 1, width do
+                if currentW == 1 then
+                    dig:up()
+                    bot:up()
+                    if digDown then 
+                        dig:up()
+                        bot:up()
+                    end
+                else
+                    bot:moveTo(currentW-1,currentL,currentH)
+                    bot:rotateTo(1)
+                    dig:forward()
+                    bot:moveTo(currentW,currentL,currentH)
+                end
+                if digUp then 
+                    dig:up() 
+                end
+                if digDown then 
+                    dig:down() 
+                end
+            end
+            currentW = width
         else
-            hDone = h
+            currentW = width
+            while currentW > 0 do
+                if currentW == width then
+                    dig:up()
+                    bot:up()
+                    if digDown then 
+                        dig:up()
+                        bot:up()
+                    end
+                else
+                    bot:moveTo(currentW+1,currentL,currentH)
+                    bot:rotateTo(3)
+                    dig:forward()
+                    bot:moveTo(currentW,currentL,currentH)
+                end
+                if digUp then 
+                    dig:up() 
+                end
+                if digDown then 
+                    dig:down() 
+                end
+                currentW = currentW - 1
+            end
+            currentW = 1
         end
-
-        if h + 2 <= height then
-            h = h + 2
-        elseif h + 1 <= height then
-            h = h + 1
-        end
+        
+        if digUp then hDone = currentH + 1
+        else hDone = currentH end
+        checkItemsAndEmpty()
     end
-    print(l)
-    l = l + 1
+    currentL = currentL + 1
 end
 
 bot:moveTo(1,0,1)
