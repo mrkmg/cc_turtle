@@ -438,9 +438,41 @@ function makeLayerPlan(layer)
 end
 
 function pickupMatsForPlan(plan,currentI)
-    local slots = {1=0, 2=0, 3=0, 4=0, 5=0, 6=0, 7=0, 8=0, 9=0, 10=0, 11=0, 12=0, 13=0, 14=0, 15=0}
+    local slots = {}
+        slots[1] = 0
+        slots[2] = 0
+        slots[3] = 0
+        slots[4] = 0
+        slots[5] = 0
+        slots[6] = 0
+        slots[7] = 0
+        slots[7] = 0
+        slots[8] = 0
+        slots[9] = 0
+        slots[10] = 0
+        slots[11] = 0
+        slots[12] = 0
+        slots[13] = 0
+        slots[14] = 0
+        slots[15] = 0
 
-    local map = {1=0, 2=0, 3=0, 4=0, 5=0, 6=0, 7=0, 8=0, 9=0, 10=0, 11=0, 12=0, 13=0, 14=0, 15=0}
+    local map = {}
+        map[1] = 0
+        map[2] = 0
+        map[3] = 0
+        map[4] = 0
+        map[5] = 0
+        map[6] = 0
+        map[7] = 0
+        map[7] = 0
+        map[8] = 0
+        map[9] = 0
+        map[10] = 0
+        map[11] = 0
+        map[12] = 0
+        map[13] = 0
+        map[14] = 0
+        map[15] = 0
 
     local con = true
     local ci = currentI
