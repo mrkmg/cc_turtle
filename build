@@ -528,23 +528,6 @@ function pickupMatsForPlan(plan,currentI)
     return r
 end
 
-function tostring(x)
-  local s
-  if type(x) == "table" then
-    s = "{"
-    local i, v = next(x)
-    while i do
-      s = s .. tostring(i) .. "=" .. tostring(v)
-      i, v = next(x, i)
-      if i then s = s .. "," end
-    end
-    return s .. "}"
-  else
-    return x
-  end
-end
-
-
 function runPlan(plan,z)
     local current
     local buildHeight = z + 1
@@ -559,7 +542,6 @@ function runPlan(plan,z)
             slots = itemStuff.slots
             map = itemStuff.map
             filledTo = itemStuff.maxI
-            print(tostring(itemStuff))
         end
         current = plan[i]
         bot:moveTo(current.x,current.y,buildHeight)
