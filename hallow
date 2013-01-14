@@ -232,18 +232,25 @@ function TGM:refuel()
             local returnY = self:getY()
             local returnZ = self:getZ()
             local returnD = self:getD()
-            self:moveToReverse(1,0,1)
+            self:rotateTo(2)
+            self:forward()
+            self:moveTo(1,0,1)
             while turtle.getItemCount(16) == 0 do
                 clearScreen()
                 print("Waiting for fuel, press enter when ready")
                 read()
             end
-            self:moveToReverse(returnX,returnY,returnZ)
+            self.checkFuel = true
+            sleep(0.1)
+            self:moveToReverse(returnX,returnY-1,returnZ)
+            self:rotate(0)
+            self:forward()
             self:rotateTo(returnD)
             self.checkFuel = true
+        else
+            turtle.select(16)
+            turtle.refuel(1)
         end
-        turtle.select(16)
-        turtle.refuel(1)
         return true
     end
     return true
