@@ -340,7 +340,7 @@ function getSlotForItem(item)
     end
 end
 
-function refillTo(box,slot,count){
+function refillTo(box,slot,count)
     local box = boxes[item]
 
     bot:moveTo(box.x,box.y,box.z+1)
@@ -355,7 +355,6 @@ function refillTo(box,slot,count){
     if turtle.getItemCount(slot) > count do
         turtle.dropDown(turtle.getItemCount(slot) - count)
     end
-}
 
 function refillItem(item)
     local returnX = bot:getX()
