@@ -27,6 +27,7 @@ end
 args = {...}
 file = args[1]
 if fs.exists(file) == false then
-	download(args[1])
+    fs.delete(file)
 end
+download(args[1])
 shell.run(file)
