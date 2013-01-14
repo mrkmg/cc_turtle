@@ -340,7 +340,7 @@ function getSlotForItem(item)
     end
 end
 
-function refillTo(box,slot,count){
+function refillTo(box,slot,count)
     local box = boxes[item]
 
     bot:moveTo(box.x,box.y,box.z+1)
@@ -352,10 +352,10 @@ function refillTo(box,slot,count){
         end
     end
 
-    if turtle.getItemCount(slot) > count do
+    if turtle.getItemCount(slot) > count then
         turtle.dropDown(turtle.getItemCount(slot) - count)
     end
-}
+end
 
 function refillItem(item)
     local returnX = bot:getX()
@@ -439,41 +439,41 @@ function makeLayerPlan(layer)
 end
 
 function pickupMatsForPlan(plan,currentI)
-    local slots = {
-        1=0,
-        2=0,
-        3=0,
-        4=0,
-        5=0,
-        6=0,
-        7=0,
-        8=0,
-        9=0,
-        10=0,
-        11=0,
-        12=0,
-        13=0,
-        14=0,
-        15=0
-    }
+    local slots = {}
+        slots[1] = 0
+        slots[2] = 0
+        slots[3] = 0
+        slots[4] = 0
+        slots[5] = 0
+        slots[6] = 0
+        slots[7] = 0
+        slots[7] = 0
+        slots[8] = 0
+        slots[9] = 0
+        slots[10] = 0
+        slots[11] = 0
+        slots[12] = 0
+        slots[13] = 0
+        slots[14] = 0
+        slots[15] = 0
 
-    local map = {
-        1=0,
-        2=0,
-        3=0,
-        4=0,
-        5=0,
-        6=0,
-        7=0,
-        8=0,
-        9=0,
-        10=0,
-        11=0,
-        12=0,
-        13=0,
-        14=0,
-        15=0
-    }
+    local map = {}
+        map[1] = 0
+        map[2] = 0
+        map[3] = 0
+        map[4] = 0
+        map[5] = 0
+        map[6] = 0
+        map[7] = 0
+        map[7] = 0
+        map[8] = 0
+        map[9] = 0
+        map[10] = 0
+        map[11] = 0
+        map[12] = 0
+        map[13] = 0
+        map[14] = 0
+        map[15] = 0
 
     local con = true
     local ci = currentI
@@ -481,6 +481,7 @@ function pickupMatsForPlan(plan,currentI)
     local cSlot = 0
     local dSlot = 0
     local dType = 0
+    
     while con == true do
         cSlot = 1
         dSlot = 0
@@ -520,12 +521,29 @@ function pickupMatsForPlan(plan,currentI)
 
     bot:moveToReverse(returnX,returnY,returnZ)
 
-    local r = {
-        slots=slots,
-        map=map,
-        maxI=ci
-    } 
+    local r = {}
+    r.slots=slots
+    r.map=map
+    r.maxI=ci
+    return r
 end
+
+function tostring(x)
+  local s
+  if type(x) == "table" then
+    s = "{"
+    local i, v = next(x)
+    while i do
+      s = s .. tostring(i) .. "=" .. tostring(v)
+      i, v = next(x, i)
+      if i then s = s .. "," end
+    end
+    return s .. "}"
+  else
+    return x
+  end
+end
+
 
 function runPlan(plan,z)
     local current
@@ -533,6 +551,7 @@ function runPlan(plan,z)
     bot:moveTo(bot:getX(),bot:getY(),buildHeight)
     local filledTo = 0
     local itemStuff, slots, map, iSlot
+    
     for i=1, table.maxn(plan) do
         iSlot = 0
         if filledTo < i then
@@ -540,15 +559,15 @@ function runPlan(plan,z)
             slots = itemStuff.slots
             map = itemStuff.map
             filledTo = itemStuff.maxI
+            print(tostring(itemStuff))
         end
         current = plan[i]
         bot:moveTo(current.x,current.y,buildHeight)
         for ii=1, 15 do
-            if map[ii] == current.b and slot[ii] > 0 then
-                iSlot = 0
-            end
+            if iSlot == 0 and map[ii] == current.b and slots[ii] > 0 then iSlot = ii end
         end
         if iSlot > 0 then
+            slots[iSlot] = slots[iSlot] - 1
             if placeDown(current.b) == false
                 print("Critical Error: Could not place block");
                 print("==More info on how to fix this in later a version==")
@@ -613,6 +632,7 @@ boxes[6] = { x = 5, y = -2, z = 0 }
 boxes[7] = { x = 1, y = -4, z = 0 }
 boxes[8] = { x = 3, y = -4, z = 0 }
 boxes[9] = { x = 5, y = -4, z = 0 }
+
 
 template = askString("Template?")
 num_mats = askNumber("Number of materials?",9)
