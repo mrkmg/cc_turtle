@@ -14,15 +14,38 @@ end
 
 function makeTree()
   turtle.select(1)
+  if turtle.getItemCount(1) == 0 then
+    turtle.turnLeft()
+    while turtle.getItemCount(1) == 0 do
+      turtle.suck()
+      sleep(1)
+    end
+    turtle.turnRight()
+  end
   turtle.place()
   turtle.select(2)
-  turtle.place()
+  if turtle.getItemCount(2) == 0 then
+    turtle.turnRight()
+    turtle.suck()
+    turtle.turnLeft()
+  end
+  if turtle.getItemCount(2) > 0 then
+    turtle.place()
+  end
+end
+
+function detectTree()
+  turtle.select(15)
+  while turtle.compare() == false do
+    sleep(1)
+  end
 end
 
 function cutTree()
   turtle.dig()
   refuel()
   turtle.forward()
+  turtle.select(3)
   while turtle.detectUp() do
     turtle.digUp()
     refuel()
@@ -41,8 +64,9 @@ function depositWood()
   turtle.dropDown()
 end
 
-while turtle.getItemCount(1) > 0 and turtle.getItemCount(2) > 0 do
+while true do
   makeTree()
+  detectTree()
   cutTree()
   depositWood()
 end
