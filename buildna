@@ -352,7 +352,7 @@ function refillTo(box,slot,count)
         end
     end
 
-    if turtle.getItemCount(slot) > count do
+    if turtle.getItemCount(slot) > count then
         turtle.dropDown(turtle.getItemCount(slot) - count)
     end
 
