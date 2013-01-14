@@ -3,58 +3,7 @@
 local author = "mrkmg"
 local project = "cc_turtle"
 local branch = "master"
---TGM Def
-Dig = {}
-Dig.__index = Dig
 
-function Dig.init()
-    local dig = {}
-    setmetatable(dig,Dig)
-    dig.collectBlocks = true
-    return dig
-end
-
-function Dig:forward()
-    local count = 0
-    while turtle.detect() and count <= 256 do
-        turtle.dig()
-        count = count + 1
-        sleep(1)
-    end
-    if count == 256 then
-        return false
-    else
-        return true
-    end
-end
-
-function Dig:up()
-    local count = 0
-    while turtle.detectUp() and count <= 256 do
-        turtle.digUp()
-        count = count + 1
-        sleep(1)
-    end
-    if count == 256 then
-        return false
-    else
-        return true
-    end
-end
-
-function Dig:down()
-    local count = 0
-    while turtle.detectDown() and count <= 256 do
-        turtle.digDown()
-        count = count + 1
-        sleep(1)
-    end
-    if count == 256 then
-        return false
-    else
-        return true
-    end
-end
 
 --TGM Def
 TGM = {}
@@ -490,11 +439,7 @@ end
 
 
 function main()
-    for s=1,num_mats do
-        checkAndRefillSlot(s)
-    end
     local height = 1;
-    log = fs.open('log',"w")
     local f = fs.open(template, "r")
     local z = 1
     local y = 0
