@@ -189,30 +189,13 @@ end
 
 function TGM:refuel()
     if turtle.getFuelLevel() == 0 then
-        if (turtle.getItemCount(16)-1) * 80 < self:getZ() + self:getY() + self:getZ() then
-            turtle.select(16)
-            turtle.refuel()
-            self.checkFuel = false
-            sleep(0.1)
-            local returnX = self:getX()
-            local returnY = self:getY()
-            local returnZ = self:getZ()
-            local returnD = self:getD()
-            self:moveToReverse(1,0,1)
-            while turtle.getItemCount(16) == 0 do
-                clearScreen()
-                print("Waiting for fuel, press enter when ready")
-                read()
-            end
-            self.checkFuel = true
-            sleep(0.1)
-            self:moveTo(returnX,returnY,returnZ)
-            self:rotateTo(returnD)
-        else
-            turtle.select(16)
-            turtle.refuel(1)
+        while turtle.getItemCount(16) == 0 do
+            clearScreen()
+            print("Waiting for fuel, press enter when ready")
+            read()
         end
-        return true
+        turtle.select(16)
+        turtle.refuel(1)
     end
     return true
 end
@@ -352,8 +335,33 @@ function askNumber(question)
     return ans
 end
 
+function buildMats()
+    local cont = true
+    local count = 0
+    while cont do
+        if turtle.getItemCount(15 - count) > 0 then
+            count = count + 1
+        else
+            cont = false
+        end
+    end
+end
 
-depth = 4-- askNumber("Depth?")
+function placeDown()
+    if numBuildmats > 0 then
+        if turtle.getItemCount(16-numBuildMats) > 0 then
+            turtle.select(16-numBuildMats)
+            turtle.placeDown()
+        else
+            numBuildmats = numBuildmats - 1
+            placeDown()
+        end
+    end
+end
+
+depth = askNumber("Depth?")
+
+numBuildmats = buildMats()
 
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
@@ -370,18 +378,39 @@ for cd = 1, depth do
     dig:up()
     dig:down()
     bot:down()
+    dig:down()
+    if numBuildmats > 0 then
+        bot:down()
+        if turtle.detectDown() == false then placeDown() end
+        bot:up()
+    end
     bot:back()
     dig:down()
+    if numBuildmats > 0 then
+        bot:down()
+        if turtle.detectDown() == false then placeDown() end
+        bot:up()
+    end
     bot:rotateTo(0)
     dig:forward()
     bot:forward()
     dig:up()
     dig:down()
+    if numBuildmats > 0 then
+        bot:down()
+        if turtle.detectDown() == false then placeDown() end
+        bot:up()
+    end
     rotateTo(1)
     dig:forward()
     bot:forward()
     dig:up()
     dig:down()
+    if numBuildmats > 0 then
+        bot:down()
+        if turtle.detectDown() == false then placeDown() end
+        bot:up()
+    end
     bot:back()
     rotateTo(0)
 end
