@@ -317,6 +317,11 @@ function makeTree()
 
   turtle.select(1)
   turtle.place()
+
+  if turtle.getItemCount(3) then
+    turtle.select(3)
+    turtle.place()
+  end
 end
 
 function detectTree()
