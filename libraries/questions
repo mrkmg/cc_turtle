@@ -1,0 +1,26 @@
+function askNumber(question,default)
+    local ans
+    local cont = true
+    term.clear()
+    term.setCursorPos( 1, 3 )
+    if default then question = question.." ("..default..")" end
+    while cont == true do -- Width Question
+        print(question)
+        ans = tonumber(read())
+        term.clear()
+        term.setCursorPos( 1, 3 )
+        if ans == nil and default then
+            ans = default
+            cont = false
+        elseif ans == nil then
+            print( "Please answer with a number." )
+        elseif ans > 0 then
+            cont = false
+        elseif ans == 0 then
+            print( "Must be greater than 0." )
+        else
+            print( "Must be positive." )
+        end
+    end
+    return ans
+end

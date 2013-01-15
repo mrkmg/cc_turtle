@@ -10,7 +10,14 @@
             body {
                 font-family: Monospace;
                 font-size: 12px;
-                background-color: #000;
+                background: #ffffff; /* Old browsers */
+                background: -moz-radial-gradient(center, ellipse cover, #ffffff 0%, #e5e5e5 100%); /* FF3.6+ */
+                background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5)); /* Chrome,Safari4+ */
+                background: -webkit-radial-gradient(center, ellipse cover, #ffffff 0%,#e5e5e5 100%); /* Chrome10+,Safari5.1+ */
+                background: -o-radial-gradient(center, ellipse cover, #ffffff 0%,#e5e5e5 100%); /* Opera 12+ */
+                background: -ms-radial-gradient(center, ellipse cover, #ffffff 0%,#e5e5e5 100%); /* IE10+ */
+                background: radial-gradient(ellipse at center, #ffffff 0%,#e5e5e5 100%); /* W3C */
+                filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
                 margin: 0px;
                 overflow: hidden;
             }
@@ -162,7 +169,7 @@ document.oncontextmenu=new Function("return false")
             var container, interval,
             camera, scene, renderer,
             projector, plane, cube, linesMaterial,
-            color = 1,colors = [ null, 0xD9D9D9, 0x303030, 0x80DF1F, 0x1FDF50, 0x1FDFDF, 0x1F4FDF, 0x7F1FDF, 0xDF1FAF, 0xDF1F1F ],
+            color = 1,colors = [ null, 0xA66829, 0xDDDDDD, 0x32B232, 0xFBB117, 0x6D7B8D, 0x1F4FDF, 0x202020, 0xDF1FAF, 0xDF1F1F ],
             ray, brush, objectHovered,
             mouse3D, isMouseDown = false, onMouseDownPosition, startMouseDown,
             radious = 3200, theta = 360, onMouseDownTheta = 45, phi = 60, onMouseDownPhi = 60,
@@ -193,7 +200,8 @@ document.oncontextmenu=new Function("return false")
                 <br />\
                 <strong>Left Click</strong>: Add Block, \
                 <strong>Right Click</strong>: Remove Block,\
-                <strong>Drag</strong>: Spin Camera\
+                <strong>Left Drag</strong>: Spin Camera\
+                <strong>Right Drag</strong>: Move World Camera\
                 <br />\
                 <a href="javascript:loadHash();">Export/Import</a> \
                 <a href="javascript:localStore();">Save/Load</a>\
@@ -228,7 +236,7 @@ document.oncontextmenu=new Function("return false")
                 geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( cubeSize/2 * -50, 0, 0 ) ) );
                 geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( cubeSize/2 * 50, 0, 0 ) ) );
 
-                linesMaterial = new THREE.LineColorMaterial( 0xFFFFFF, 0.2 );
+                linesMaterial = new THREE.LineColorMaterial( 0x000000, 0.2 );
 
                 for ( var i = 0; i <= cubeSize; i ++ ) {
 
@@ -263,7 +271,7 @@ document.oncontextmenu=new Function("return false")
 
                 // Lights
 
-                var ambientLight = new THREE.AmbientLight( 0x404040 );
+                var ambientLight = new THREE.AmbientLight( 0x808080 );
                 scene.addLight( ambientLight );
 
                 var directionalLight = new THREE.DirectionalLight( 0xEEEEEE );
@@ -273,7 +281,7 @@ document.oncontextmenu=new Function("return false")
                 directionalLight.position.normalize();
                 scene.addLight( directionalLight );
 
-                var directionalLight = new THREE.DirectionalLight( 0x808080 );
+                var directionalLight = new THREE.DirectionalLight( 0xA0A0A0 );
                 directionalLight.position.x = - 1;
                 directionalLight.position.y = 1;
                 directionalLight.position.z = - 0.75;
@@ -450,8 +458,10 @@ document.oncontextmenu=new Function("return false")
                         } else if(fillModDown) {
                             if(fillPos1 == false){
                                 fillPos1 = getXYZFromIntersect(intersect);
+                                popit("Set Position 1");
                             } else {
                                 var fillPos2 = getXYZFromIntersect(intersect);
+                                popit("Area Filled, All Positions Clear");
                                 var x1  = fillPos1[0]>fillPos2[0]?fillPos2[0]:fillPos1[0];
                                 var x2  = fillPos1[0]>fillPos2[0]?fillPos1[0]:fillPos2[0];
 
@@ -987,6 +997,25 @@ document.oncontextmenu=new Function("return false")
                 container.style.display = "none";
                 document.body.appendChild(show);
 
+            }
+
+
+
+            function popit(str) {
+                var d = document.createElement( 'div' );
+                d.innerHTML = str;
+                d.style.position = 'absolute';
+                d.style.top = '10px';
+                d.style.right = '10px';
+                d.style.background = '#000';
+                d.style.color = "#fff";
+                d.style.padding = "8px";
+                d.style['border-radius'] = '5px';
+                document.body.appendChild(d);
+
+                setTimeout(function(){
+                    document.body.removeChild(d);
+                },1000);
             }
 
             function fixStringUp(string){

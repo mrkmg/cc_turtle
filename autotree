@@ -9,14 +9,13 @@ function TGM.init(x,y,z,d)
     grid.y = y or 1
     grid.z = z or 1
     grid.d = d or 0
+    grid.checkFuel = true
+    grid.fuelback = false
     return grid
 end
 
 function TGM:rotateRight()
     turtle.turnRight()
-    print("aaaaaaaaaa")
-    print(self.d)
-    print("aaaaaaaaaa")
     self.d = (self.d + 1) % 4
 end
 
@@ -26,24 +25,39 @@ function TGM:rotateLeft()
 end
 
 
-function TGM:forward()
+function TGM:forward(kt)
     self:refuel()
-    if turtle.forward() then
+    if kt == true then
+        while turtle.forward() == false do
+            sleep(1)
+        end
         if     self:getD() == 0 then self.y = self.y + 1
         elseif self:getD() == 1 then self.x = self.x + 1
         elseif self:getD() == 2 then self.y = self.y - 1
         elseif self:getD() == 3 then self.x = self.x - 1
-        return true
         end
+        return true
     else
-        sleep(1)
-        return false
+        if turtle.forward() then
+            if     self:getD() == 0 then self.y = self.y + 1
+            elseif self:getD() == 1 then self.x = self.x + 1
+            elseif self:getD() == 2 then self.y = self.y - 1
+            elseif self:getD() == 3 then self.x = self.x - 1
+            end
+            return true
+        else
+            sleep(1)
+            return false
+        end
     end
 end
 
-function TGM:back()
+function TGM:back(kt)
     self:refuel()
-    if turtle.back() then
+    if kt == true then
+        while turtle.back() == false do
+            sleep(1)
+        end
         if     self:getD() == 0 then self.y = self.y - 1
         elseif self:getD() == 1 then self.x = self.x - 1
         elseif self:getD() == 2 then self.y = self.y + 1
@@ -51,28 +65,51 @@ function TGM:back()
         end
         return true
     else
-        sleep(1)
-        return false
+        if turtle.back() then
+            if     self:getD() == 0 then self.y = self.y - 1
+            elseif self:getD() == 1 then self.x = self.x - 1
+            elseif self:getD() == 2 then self.y = self.y + 1
+            elseif self:getD() == 3 then self.x = self.x + 1
+            end
+            return true
+        else
+            sleep(1)
+            return false
+        end
     end
 end
 
-function TGM:up()
+function TGM:up(kt)
     self:refuel()
-    if turtle.up() then
+    if kt == true then
+        while turtle.up() == false do
+            sleep(1)
+        end
         self.z = self.z + 1
-        return true
-    else
-        return false
+    else 
+        if turtle.up() then
+            self.z = self.z + 1
+            return true
+        else
+            return false
+        end
     end
 end
 
-function TGM:down()
+function TGM:down(kt)
     self:refuel()
-    if turtle.down() then
+    if kt == true then
+        while turtle.up == false do
+            sleep(1)
+        end
         self.z = self.z - 1
     else
-        sleep(1)
-        return false
+        if turtle.down() then
+            self.z = self.z - 1
+        else
+            sleep(1)
+            return false
+        end
     end
 end
 
@@ -116,9 +153,9 @@ function TGM:rotateTo(d)
     end
 end
 
-function TGM:moveTo(x,y,z)
+function TGM:gotoX(x)
+    -- X
     if self:getX() ~= x then
-        -- X
         if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
         while self:getX() < x do
             sleep(0.1)
@@ -137,6 +174,9 @@ function TGM:moveTo(x,y,z)
             end
         end
     end
+end
+
+function TGM:gotoY(y)
     -- Y
     if self:getY() ~= y then
         if self:getD() == 1 or self:getD() == 3 then self:rotateTo(0) end
@@ -157,6 +197,9 @@ function TGM:moveTo(x,y,z)
             end
         end
     end
+end
+
+function TGM:gotoZ(z)
     -- Z
     while self:getZ() < z do
         self:up()
@@ -166,72 +209,52 @@ function TGM:moveTo(x,y,z)
         sleep(0.1)
         self:down()
     end
+end
+
+function TGM:moveTo(x,y,z)
+    self:gotoX(x)
+    self:gotoY(y)
+    self:gotoZ(z)
 end
 
 function TGM:moveToReverse(x,y,z)
-    -- Z
-    while self:getZ() < z do
-        self:up()
-        sleep(0.1)
-    end
-    while self:getZ() > z do
-        sleep(0.1)
-        self:down()
-    end
-    -- Y
-    if self:getY() ~= y then
-        if self:getD() == 1 or self:getD() == 3 then self:rotateTo(0) end
-        while self:getY() < y do
-            sleep(0.1)
-            if self:getD() == 0 then
-                self:forward()
-            else 
-                self:back()
-            end
-        end
-        while self:getY() > y do
-            sleep(0.1)
-            if self:getD() == 0 then
-                self:back()
-            else 
-                self:forward()
-            end
-        end
-    end
-    if self:getX() ~= x then
-        -- X
-        if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
-        while self:getX() < x do
-            sleep(0.1)
-            if self:getD() == 1 then
-                self:forward()
-            else 
-                self:back()
-            end
-        end
-        while self:getX() > x do
-            sleep(0.1)
-            if self:getD() == 1 then
-                self:back()
-            else 
-                self:forward()
-            end
-        end
-    end
+    self:gotoZ(z)
+    self:gotoY(y)
+    self:gotoX(x)
 end
 
 function TGM:refuel()
-    if turtle.getFuelLevel() == 0 then
-        while turtle.getItemCount(16) == 0 do
-            clearScreen()
-            print("Waiting for fuel, press enter when ready")
-            read()
+    if self.checkFuel then
+        if turtle.getFuelLevel() == 0 then
+            if turtle.getItemCount(16) <= 3 and self.fuelback == false then
+                self.fuelback = true
+                turtle.select(16)
+                turtle.refuel(1)
+                sleep(0.1)
+                local returnX = self:getX()
+                local returnY = self:getY()
+                local returnZ = self:getZ()
+                local returnD = self:getD()
+                self:moveToReverse(1,0,1)
+                while turtle.getItemCount(16) <= 3 do
+                    clearScreen()
+                    print("Waiting for fuel, press enter when ready")
+                    read()
+                end
+                self.fuelback = false
+                sleep(0.1)
+                self:moveTo(returnX,returnY,returnZ)
+                self:rotateTo(returnD)
+            else
+                turtle.select(16)
+                turtle.refuel(1)
+            end
+            return true
         end
-        turtle.select(16)
-        turtle.refuel(1)
+        return true
+    else
         return true
     end
-    return true
 end
 
 function TGM:getX()
@@ -249,6 +272,7 @@ end
 function TGM:getD()
     return self.d
 end
+
 
 function writeAt(string, columnVar, rowVar)
     term.setCursorPos( columnVar, rowVar )
@@ -313,17 +337,8 @@ function Dig:down()
 end
 
 function makeTree()
-  print("PENIS")
-
   turtle.select(1)
   turtle.place()
-
-  if turtle.getItemCount(3) > 0 then
-    while turtle.getItemCount(3) > 0 and isTree = false do
-      turtle.select(3)
-      turtle.place()
-    end
-  end
 end
 
 function isTree()
@@ -331,96 +346,103 @@ function isTree()
   return turtle.compare()
 end
 
-function detectTree()
-  print("PENIS")
+function detectAndForceTree()
 
   turtle.select(2)
   while turtle.compare() == false do
+    if turtle.getItemCount(3) > 0 then
+        turtle.select(3)
+        turtle.place()
+    end
     sleep(1)
+    turtle.select(2)
   end
 end
 
-function cutTree()
-  print("PENIS")
 
-  local maxH = 8
-  local sq = 2
-  local su = 3
-
-  local ch,cx,cy
-
-  turtle.select(1)
-
-  for ch = 1, maxH do
-    if ch == 1 then
-      dig:forward()
-      bot:forward()
-    else
-      dig:up()
-      bot:up()
+function cutForward(maxDistance)
+    local c = 0
+    bot:rotateTo(0)
+    while turtle.detect() == true do
+        c = c + 1
+        dig:forward()
+        if c < maxDistance then bot:forward() end
     end
-    if ch >= su then
-      bot:rotateTo(0)
-      for si = 1, sq do
+    bot:gotoY(0)
+end
+
+function cutBackward(maxDistance)
+    local c = 0
+    bot:rotateTo(2)
+    while turtle.detect() == true do
+        c = c + 1
         dig:forward()
-        if si < sq then bot:forward() end
-      end
-      bot:rotateTo(2)
-      for si = 1, sq - 1 do bot:forward() end
-      for si = 1, sq do
+        if c < maxDistance then bot:forward() end
+    end
+    bot:gotoY(0)
+end
+
+function cutLeft(maxDistance)
+    local c = 0
+    bot:rotateTo(3)
+    while turtle.detect() == true do
         dig:forward()
-        if si < sq then bot:forward() end
-      end
-      bot:rotateTo(0)
-      for si = 1, sq - 1 do bot:forward() end
-      for ti = 1, sq do
-        bot:rotateTo(1)
-        dig:forward()
-        bot:forward()
-        bot:rotateTo(0)
-        for si = 1, sq do
-          dig:forward()
-        if si < sq then bot:forward() end
+        if c <= maxDistance then
+            bot:forward()
+            cutForward(maxDistance)
+            cutBackward(maxDistance)
         end
-        bot:rotateTo(2)
-        for si = 1, sq - 1 do bot:forward() end
-        for si = 1, sq do
-          dig:forward()
-        if si < sq then bot:forward() end
-        end
-        bot:rotateTo(0)
-        for si = 1, sq - 1 do bot:forward() end
-      end
-      bot:rotateTo(3)
-      for si = 1, sq do bot:forward() end
-      for ti = 1, sq do
         bot:rotateTo(3)
-        dig:forward()
-        bot:forward()
-        bot:rotateTo(0)
-        for si = 1, sq do
-          dig:forward()
-        if si < sq then bot:forward() end
-        end
-        bot:rotateTo(2)
-        for si = 1, sq - 1 do bot:forward() end
-        for si = 1, sq do
-          dig:forward()
-        if si < sq then bot:forward() end
-        end
-        bot:rotateTo(0)
-        for si = 1, sq - 1 do bot:forward() end
-      end
-      bot:rotateTo(1)
-      for si = 1, sq do bot:forward() end
     end
-  end
+    bot:gotoX(0)
+end
 
-  for ch=1, maxH do
-    bot:down()
-  end
-  bot:rotateTo(0)
-  bot:back()
+function cutRight(maxDistance)
+    local c = 0
+    bot:rotateTo(1)
+    
+    while turtle.detect() == true do
+        dig:forward()
+        if c <= maxDistance then
+            bot:forward()
+            cutForward(maxDistance)
+            cutBackward(maxDistance)
+        end
+        bot:rotateTo(1)
+    end
+    bot:gotoX(0)
+end
+
+function cutTree()
+    local ch
+
+    for ch=1,maxX do
+        if ch == 1 then
+            dig:forward()
+            bot:forward()
+        else
+            dig:up()
+            bot:up()
+        end
+
+        if ch >= su then
+            cutForward(sq)
+            cutBackward(sq)
+            cutLeft(sq)
+            cutRight(sq)
+        end
+        bot:gotoX(0)
+        bot:gotoY(0)
+
+        if turtle.detectUp() == false then
+            break
+        end
+    end
+    bot:gotoX(0)
+    bot:gotoY(0)
+    bot:gotoZ(1)
+    bot:gotoY(-1)
+    bot:rotateTo(0)
 end
 
 function depositWood()
@@ -428,18 +450,16 @@ function depositWood()
   turtle.dropDown( turtle.getItemCount(2) - 1)
 end
 
+maxH = 8
+sq = 2
+su = 3
 
-sappingLocation = 1
-woodLocation = 2
-
-fuelLocation = 16
-
-bot = TGM.init(1,0,1,0)
+bot = TGM.init(0,-1,1,0)
 dig = Dig.init()
 
 while true do
   makeTree()
-  detectTree()
+  detectAndForceTree()
   cutTree()
   depositWood()
 end
