@@ -2,14 +2,17 @@
 TGM = {}
 TGM.__index = TGM
 
+--TGM Def
+TGM = {}
+TGM.__index = TGM
+
 function TGM.init(x,y,z,d)
     local grid = {}
     setmetatable(grid,TGM)
-    grid.x = x
-    grid.y = y 
-    grid.z = z
-    grid.d = d
-    grid.checkFuel = true
+    grid.x = x or 1
+    grid.y = y or 1
+    grid.z = z or 1
+    grid.d = d or 0
     return grid
 end
 
@@ -25,7 +28,7 @@ end
 
 
 function TGM:forward()
-    if self.checkFuel then self:refuel() end
+    self:refuel()
     if turtle.forward() then
         if     self:getD() == 0 then self.y = self.y + 1
         elseif self:getD() == 1 then self.x = self.x + 1
@@ -40,7 +43,7 @@ function TGM:forward()
 end
 
 function TGM:back()
-    if self.checkFuel then self:refuel() end
+    self:refuel()
     if turtle.back() then
         if     self:getD() == 0 then self.y = self.y - 1
         elseif self:getD() == 1 then self.x = self.x - 1
@@ -55,7 +58,7 @@ function TGM:back()
 end
 
 function TGM:up()
-    if self.checkFuel then self:refuel() end
+    self:refuel()
     if turtle.up() then
         self.z = self.z + 1
         return true
@@ -65,7 +68,7 @@ function TGM:up()
 end
 
 function TGM:down()
-    if self.checkFuel then self:refuel() end
+    self:refuel()
     if turtle.down() then
         self.z = self.z - 1
     else
@@ -114,9 +117,9 @@ function TGM:rotateTo(d)
     end
 end
 
-function TGM:gotoX(x)
-    -- X
+function TGM:moveTo(x,y,z)
     if self:getX() ~= x then
+        -- X
         if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
         while self:getX() < x do
             sleep(0.1)
@@ -135,9 +138,6 @@ function TGM:gotoX(x)
             end
         end
     end
-end
-
-function TGM:gotoY(y)
     -- Y
     if self:getY() ~= y then
         if self:getD() == 1 or self:getD() == 3 then self:rotateTo(0) end
@@ -158,9 +158,6 @@ function TGM:gotoY(y)
             end
         end
     end
-end
-
-function TGM:gotoZ(z)
     -- Z
     while self:getZ() < z do
         self:up()
@@ -172,43 +169,67 @@ function TGM:gotoZ(z)
     end
 end
 
-function TGM:moveTo(x,y,z)
-    self:gotoX(x)
-    self:gotoY(y)
-    self:gotoZ(z)
-end
-
 function TGM:moveToReverse(x,y,z)
-    self:gotoZ(z)
-    self:gotoY(y)
-    self:gotoX(x)
+    -- Z
+    while self:getZ() < z do
+        self:up()
+        sleep(0.1)
+    end
+    while self:getZ() > z do
+        sleep(0.1)
+        self:down()
+    end
+    -- Y
+    if self:getY() ~= y then
+        if self:getD() == 1 or self:getD() == 3 then self:rotateTo(0) end
+        while self:getY() < y do
+            sleep(0.1)
+            if self:getD() == 0 then
+                self:forward()
+            else 
+                self:back()
+            end
+        end
+        while self:getY() > y do
+            sleep(0.1)
+            if self:getD() == 0 then
+                self:back()
+            else 
+                self:forward()
+            end
+        end
+    end
+    if self:getX() ~= x then
+        -- X
+        if self:getD() == 0 or self:getD() == 2 then self:rotateTo(1) end
+        while self:getX() < x do
+            sleep(0.1)
+            if self:getD() == 1 then
+                self:forward()
+            else 
+                self:back()
+            end
+        end
+        while self:getX() > x do
+            sleep(0.1)
+            if self:getD() == 1 then
+                self:back()
+            else 
+                self:forward()
+            end
+        end
+    end
 end
 
 function TGM:refuel()
     if turtle.getFuelLevel() == 0 then
-        if (turtle.getItemCount(16)-1) * 80 < self:getZ() + self:getY() + self:getZ() then
-            turtle.select(16)
-            turtle.refuel()
-            self.checkFuel = false
-            sleep(0.1)
-            local returnX = self:getX()
-            local returnY = self:getY()
-            local returnZ = self:getZ()
-            local returnD = self:getD()
-            self:moveToReverse(1,0,1)
-            while turtle.getItemCount(16) == 0 do
-                clearScreen()
-                print("Waiting for fuel, press enter when ready")
-                read()
-            end
-            self.checkFuel = true
-            sleep(0.1)
-            self:moveTo(returnX,returnY,returnZ)
-            self:rotateTo(returnD)
-        else
-            turtle.select(16)
-            turtle.refuel(1)
+        while turtle.getItemCount(16) == 0 do
+            clearScreen()
+            print("Waiting for fuel, press enter when ready")
+            read()
         end
+        turtle.select(16)
+        turtle.refuel(1)
         return true
     end
     return true
@@ -237,7 +258,7 @@ end
 
 function clearScreen()
     term.clear()
-    writeAt("Hallow",5,1)
+    writeAt("Build",5,1)
     term.setCursorPos( 1, 3 )
 end
 
@@ -384,7 +405,7 @@ local fuelLocation = 16
 
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
-  
+
 while true do
   makeTree()
   detectTree()
