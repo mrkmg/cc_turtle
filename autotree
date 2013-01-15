@@ -369,6 +369,7 @@ function cutTree()
       bot:rotateTo(3)
       for si = 1, sq do bot:forward() end
       for ti = 1, sq do
+        bot:rotateTo(3)
         dig:forward()
         bot:forward()
         bot:rotateTo(0)
