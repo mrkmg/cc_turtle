@@ -371,6 +371,7 @@ local digUp = false
 while currentL <= length do
     hDone = 0
     bot:gotoZ(1)
+    cHeight = 1
     dig:forward()
     bot:forward()
     while hDone < height do
@@ -382,7 +383,7 @@ while currentL <= length do
             digDown = false
             digUp = true
             currentH = hDone + 1
-        elseif height -hDone > 2 then
+        elseif height - hDone > 2 then
             digDown = true
             digUp = true
             currentH = hDone + 2
@@ -390,11 +391,10 @@ while currentL <= length do
         if currentW == 1 then
             for currentW = 1, width do
                 if currentW == 1 then
-                    dig:up()
-                    bot:up()
-                    if digDown then 
+                    while cHeight < currentH do
                         dig:up()
                         bot:up()
+                        cHeight = cHeight + 1
                     end
                 else
                     bot:moveTo(currentW-1,currentL,currentH)
@@ -414,11 +414,10 @@ while currentL <= length do
             currentW = width
             while currentW > 0 do
                 if currentW == width then
-                    dig:up()
-                    bot:up()
-                    if digDown then 
+                    while cHeight < currentH do
                         dig:up()
                         bot:up()
+                        cHeight = cHeight + 1
                     end
                 else
                     bot:moveTo(currentW+1,currentL,currentH)
