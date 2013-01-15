@@ -14,7 +14,9 @@ end
 
 function TGM:rotateRight()
     turtle.turnRight()
+    print("aaaaaaaaaa")
     print(self.d)
+    print("aaaaaaaaaa")
     self.d = (self.d + 1) % 4
 end
 
