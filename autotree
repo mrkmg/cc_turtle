@@ -402,6 +402,8 @@ woodLocation = 2
 
 fuelLocation = 16
 
+  print("PENIS")
+  
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
 
