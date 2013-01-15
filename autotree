@@ -406,9 +406,9 @@ function cutTree()
 
   for ch=1, maxH do
     bot:down()
-    bot:rotateTo(0)
-    bot:back()
   end
+  bot:rotateTo(0)
+  bot:back()
 end
 
 function depositWood()
