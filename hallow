@@ -372,6 +372,7 @@ while currentL <= length do
     hDone = 0
     bot:gotoZ(1)
     cHeight = 1
+    bot:rotateTo(0)
     dig:forward()
     bot:forward()
     while hDone < height do
