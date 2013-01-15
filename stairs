@@ -334,11 +334,11 @@ end
 function askNumber(question)
     local ans
     local cont = true
-    clearScreen()
+    -- clearScreen()
     while cont == true do 
         print(question)
         ans = tonumber(read())
-        clearScreen()
+        -- clearScreen()
         if ans == nil then
             print( "Please answer with a number." )
         elseif ans > 0 then
@@ -353,35 +353,37 @@ function askNumber(question)
 end
 
 
-depth = askNumber("Depth?")
+depth = 4-- askNumber("Depth?")
 
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
 
-local destL = depth * 2
-local dX = 0
-local dY = 0
-local dZ = 0
-
-
-for currentL = 1, destL do
-    dY = currentL
-    dZ = currentL
-    if ( dZ % 2 )  == 1 then
-        dZ = dZ + 1
-    end
-    dZ = 2 - (dZ / 2)
-
-    bot:gotoX(1)
-    bot:gotoY(dY - 1)
-    bot:gotoZ(dZ)
-    dig:foward()
-    bot:gotoY(dy)
-    dig:up()
-    dig:down()
-    bot:rotateTo(1)
-    dig:foward()
+bot:up()
+for cd = 1, depth do
+    dig:forward()
     bot:forward()
     dig:up()
     dig:down()
+    bot:rotateTo(1)
+    dig:forward()
+    bot:forward()
+    dig:up()
+    dig:down()
+    bot:down()
+    bot:back()
+    dig:down()
+    bot:rotateTo(0)
+    dig:forward()
+    bot:forward()
+    dig:up()
+    dig:down()
+    rotateTo(1)
+    dig:forward()
+    bot:forward()
+    dig:up()
+    dig:down()
+    bot:back()
+    rotateTo(0)
 end
+
+
