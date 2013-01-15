@@ -5,10 +5,10 @@ TGM.__index = TGM
 function TGM.init(x,y,z,d)
     local grid = {}
     setmetatable(grid,TGM)
-    grid.x = x or 1
-    grid.y = y or 1
-    grid.z = z or 1
-    grid.d = d or 0
+    grid.x = x
+    grid.y = y 
+    grid.z = z
+    grid.d = d
     grid.checkFuel = true
     return grid
 end
