@@ -331,7 +331,7 @@ end
 function cutTree()
   print("PENIS")
 
-  local maxH = 10
+  local maxH = 8
   local sq = 2
   local su = 3
 
