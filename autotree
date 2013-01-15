@@ -382,9 +382,10 @@ local woodLocation = 2
 
 local fuelLocation = 16
 
+bot = TGM.init(1,0,1,0)
+dig = Dig.init()
+  
 while true do
-  bot = TGM.init(1,0,1,0)
-  dig = Dig.init()
   makeTree()
   detectTree()
   cutTree()
