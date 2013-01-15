@@ -397,10 +397,10 @@ function depositWood()
 end
 
 
-local sappingLocation = 1
-local woodLocation = 2
+sappingLocation = 1
+woodLocation = 2
 
-local fuelLocation = 16
+fuelLocation = 16
 
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
