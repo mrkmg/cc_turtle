@@ -363,6 +363,11 @@ function cutTree()
       for si = 1, sq do bot:forward() end
     end
   end
+
+  for ch=1, maxH do
+    bot:down()
+    bot:rotateTo(0)
+    bot:back()
 end
 
 function depositWood()
