@@ -351,16 +351,16 @@ function cutTree()
       bot:rotateTo(0)
       for si = 1, sq do
         dig:forward()
-        bot:forward()
+        if si < sq then bot:forward() end
       end
       bot:rotateTo(2)
-      for si = 1, sq do bot:forward() end
+      for si = 1, sq - 1 do bot:forward() end
       for si = 1, sq do
         dig:forward()
-        bot:forward()
+        if si < sq then bot:forward() end
       end
       bot:rotateTo(0)
-      for si = 1, sq do bot:forward() end
+      for si = 1, sq - 1 do bot:forward() end
       for ti = 1, sq do
         bot:rotateTo(1)
         dig:forward()
@@ -368,16 +368,16 @@ function cutTree()
         bot:rotateTo(0)
         for si = 1, sq do
           dig:forward()
-          bot:forward()
+        if si < sq then bot:forward() end
         end
         bot:rotateTo(2)
-        for si = 1, sq do bot:forward() end
+        for si = 1, sq - 1 do bot:forward() end
         for si = 1, sq do
           dig:forward()
-          bot:forward()
+        if si < sq then bot:forward() end
         end
         bot:rotateTo(0)
-        for si = 1, sq do bot:forward() end
+        for si = 1, sq - 1 do bot:forward() end
       end
       bot:rotateTo(3)
       for si = 1, sq do bot:forward() end
@@ -388,16 +388,16 @@ function cutTree()
         bot:rotateTo(0)
         for si = 1, sq do
           dig:forward()
-          bot:forward()
+        if si < sq then bot:forward() end
         end
         bot:rotateTo(2)
-        for si = 1, sq do bot:forward() end
+        for si = 1, sq - 1 do bot:forward() end
         for si = 1, sq do
           dig:forward()
-          bot:forward()
+        if si < sq then bot:forward() end
         end
         bot:rotateTo(0)
-        for si = 1, sq do bot:forward() end
+        for si = 1, sq - 1 do bot:forward() end
       end
       bot:rotateTo(1)
       for si = 1, sq do bot:forward() end
