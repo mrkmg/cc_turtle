@@ -313,11 +313,15 @@ function Dig:down()
 end
 
 function makeTree()
+  print("PENIS")
+
   turtle.select(1)
   turtle.place()
 end
 
 function detectTree()
+  print("PENIS")
+
   turtle.select(2)
   while turtle.compare() == false do
     sleep(1)
@@ -325,6 +329,8 @@ function detectTree()
 end
 
 function cutTree()
+  print("PENIS")
+
   local maxH = 10
   local sq = 5
   local su = 3
@@ -402,13 +408,10 @@ woodLocation = 2
 
 fuelLocation = 16
 
-  print("PENIS")
-  
 bot = TGM.init(1,0,1,0)
 dig = Dig.init()
 
 while true do
-  print("PENIS")
   makeTree()
   detectTree()
   cutTree()
