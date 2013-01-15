@@ -348,6 +348,19 @@ function cutTree()
       bot:up()
     end
     if ch >= su then
+      bot:rotateTo(0)
+      for si = 1, sq do
+        dig:forward()
+        bot:forward()
+      end
+      bot:rotateTo(2)
+      for si = 1, sq do bot:forward() end
+      for si = 1, sq do
+        dig:forward()
+        bot:forward()
+      end
+      bot:rotateTo(0)
+      for si = 1, sq do bot:forward() end
       for ti = 1, sq do
         bot:rotateTo(1)
         dig:forward()
