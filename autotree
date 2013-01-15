@@ -366,8 +366,6 @@ function cutTree()
 end
 
 function depositWood()
-  turtle.select(1)
-  turtle.dropDown( turtle.getItemCount(1) - 1)
   turtle.select(2)
   turtle.dropDown( turtle.getItemCount(2) - 1)
 end
