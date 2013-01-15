@@ -332,7 +332,7 @@ function cutTree()
   print("PENIS")
 
   local maxH = 10
-  local sq = 5
+  local sq = 2
   local su = 3
 
   local ch,cx,cy
