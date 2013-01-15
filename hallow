@@ -368,9 +368,11 @@ local hDone = 0
 local digDown = false
 local digUp = false
 
-
 while currentL <= length do
     hDone = 0
+    bot:gotoZ(1)
+    dig:forward()
+    bot:forward()
     while hDone < height do
         if height - hDone == 1 then
             digDown = false
@@ -385,7 +387,6 @@ while currentL <= length do
             digUp = true
             currentH = hDone + 2
         end
-
         if currentW == 1 then
             for currentW = 1, width do
                 if currentW == 1 then

@@ -318,10 +318,17 @@ function makeTree()
   turtle.select(1)
   turtle.place()
 
-  if turtle.getItemCount(3) then
-    turtle.select(3)
-    turtle.place()
+  if turtle.getItemCount(3) > 0 then
+    while turtle.getItemCount(3) > 0 and isTree = false do
+      turtle.select(3)
+      turtle.place()
+    end
   end
+end
+
+function isTree()
+  turtle.select(2)
+  return turtle.compare()
 end
 
 function detectTree()
