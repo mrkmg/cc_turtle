@@ -445,4 +445,9 @@ while currentL <= length do
 end
 
 bot:moveTo(1,0,1)
+bot:rotateTo(1)
+for c = 1, 14 do
+    turtle.select(c)
+    turtle.drop()
+end
 bot:rotateTo(0)
