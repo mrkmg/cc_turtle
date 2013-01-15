@@ -368,6 +368,7 @@ function cutTree()
     bot:down()
     bot:rotateTo(0)
     bot:back()
+  end
 end
 
 function depositWood()
