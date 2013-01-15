@@ -415,6 +415,7 @@ while currentL <= length do
             currentW = width
             while currentW > 0 do
                 print("s"..currentW.." "..width)
+                print("t"..cHeight.." "..currentH)
                 if currentW == width then
                     while cHeight < currentH do
                         dig:up()
