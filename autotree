@@ -2,10 +2,6 @@
 TGM = {}
 TGM.__index = TGM
 
---TGM Def
-TGM = {}
-TGM.__index = TGM
-
 function TGM.init(x,y,z,d)
     local grid = {}
     setmetatable(grid,TGM)
