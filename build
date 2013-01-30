@@ -346,7 +346,7 @@ function refillTo(ii,slot,count)
     bot:moveTo(box.x,box.y,box.z+1)
     turtle.select(slot)
     while turtle.getItemCount(slot) < count do
-        while turtle.suckDown() == false do
+        while turtle.suckDown(1) == false do
             print("Please refill crate " .. ii .. " and press enter.")
             read()
         end
