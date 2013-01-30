@@ -550,7 +550,7 @@ function runPlan(plan,z)
         end
         if iSlot > 0 then
             slots[iSlot] = slots[iSlot] - 1
-            if placeDown(current.b) == false
+            if placeDown(current.b) == false then
                 print("Critical Error: Could not place block");
                 print("==More info on how to fix this in later a version==")
                 sleep(500)
