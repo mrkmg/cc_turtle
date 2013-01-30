@@ -511,7 +511,7 @@ function pickupMatsForPlan(plan,currentI)
     
     for ai = 1, 15 do
         if map[ai] > 0 then
-            refillTo(map[ai],i,slots[ai])
+            refillTo(map[ai],ai,slots[ai])
             if ai < 15 and turtle.getItemCount(ai+1) > 0 then
                 turtle.select(ai+1)
                 turtle.dropDown()
