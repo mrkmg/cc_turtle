@@ -340,14 +340,14 @@ function getSlotForItem(item)
     end
 end
 
-function refillTo(box,slot,count)
-    local box = boxes[item]
+function refillTo(ii,slot,count)
+    local box = boxes[ii]
 
     bot:moveTo(box.x,box.y,box.z+1)
     turtle.select(slot)
     while turtle.getItemCount(slot) < count do
         while turtle.suckDown() == false do
-            print("Please refill crate " .. item .. " and press enter.")
+            print("Please refill crate " .. ii .. " and press enter.")
             read()
         end
     end
