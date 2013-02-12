@@ -593,7 +593,7 @@ function main()
             end
         else
             plan = makeLayerPlan(layer)
-            runPlan(plan,z);
+            runPlan(plan,z)
             layer = {}
             z = z + 1
             y = 0
