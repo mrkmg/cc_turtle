@@ -416,7 +416,7 @@ end
 function cutTree()
     local ch
 
-    for ch=1,maxX do
+    for ch=1,maxH do
         if ch == 1 then
             dig:forward()
             bot:forward()
