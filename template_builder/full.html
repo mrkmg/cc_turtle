@@ -460,6 +460,34 @@ document.oncontextmenu=new Function("return false")
                                 fillPos1 = getXYZFromIntersect(intersect);
                                 popit("Set Position 1");
                             } else {
+                                var i = 0;
+                                var blocks = [];
+                                for(var z = 1;z < parseInt(cubeSize)+1;z++){
+                                    blocks[z] = [];
+                                    for(var y = 1;y < parseInt(cubeSize)+1;y++){
+                                        blocks[z][y] = [];
+                                        for(var x = 1;x < parseInt(cubeSize)+1;x++){
+                                            blocks[z][y][x] = 0;
+                                        }
+                                    }
+                                }
+                                var current = { x: 0, y: 0, z: 0, c: 0 }
+
+                                while ( i < scene.objects.length ) {
+
+                                    object = scene.objects[ i ];
+
+                                    if ( object instanceof THREE.Mesh && object !== plane && object !== brush ) {
+                                        current.x = cubeSize - 1 - ( ( object.position.x/50 ) + (cubeSize/2 - .5) );
+                                        current.y = ( object.position.z/50 ) + (cubeSize/2 - .5);
+                                        current.z = ( object.position.y/50 ) + 0.5;
+                                        current.c = colors.indexOf( object.material[ 0 ].color.hex & 0xffffff );
+                                        blocks[current.z][current.y+1][current.x+1] = current.c;
+                                    }
+
+                                    i++;
+                                }
+
                                 var fillPos2 = getXYZFromIntersect(intersect);
                                 popit("Area Filled, All Positions Clear");
                                 var x1  = fillPos1[0]>fillPos2[0]?fillPos2[0]:fillPos1[0];
@@ -474,7 +502,10 @@ document.oncontextmenu=new Function("return false")
                                 for(var x = x1; x <= x2;x+=50){
                                     for(var y = y1; y <= y2;y+=50){
                                         for(var z = z1; z <= z2;z+=50){
-                                            placeBlock(x,y,z)
+                                            current.x = cubeSize - 1 - ( ( x/50 ) + (cubeSize/2 - .5) );
+                                            current.y = ( z/50 ) + (cubeSize/2 - .5);
+                                            current.z = ( y/50 ) + 0.5;
+                                            if(blocks[current.z][current.y+1][current.x+1] == 0) placeBlock(x,y,z);
                                         }
                                     }
                                 }
@@ -933,7 +964,6 @@ document.oncontextmenu=new Function("return false")
                         current.z = ( object.position.y/50 ) + 0.5;
                         current.c = colors.indexOf( object.material[ 0 ].color.hex & 0xffffff );
                         blocks[current.z][current.y+1][current.x+1] = current.c;
-
                     }
 
                     i++;
@@ -971,7 +1001,18 @@ document.oncontextmenu=new Function("return false")
                 for(var i in path){
                     str += path[i][2]+' '+path[i][1]+' '+path[i][0]+' '+path[i][3]+"\n";
                 }
-                console.log(str);
+                var show = document.createElement( 'textarea' );
+                container.style.display = "none";
+                document.body.appendChild(show);
+                show.value =  str;
+                show.focus();
+                show.select();
+                show.addEventListener('keyup',function(ev){
+                    if( ev.keyCode == 27 ){
+                        container.style.display = "block";
+                        discardElement(show);
+                    }
+                });
             }
 
             function loadHash(){

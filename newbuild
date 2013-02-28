@@ -276,109 +276,222 @@ function TGM:getD()
     return self.d
 end
 
-function pickupMatsForPlan(plan,currentI)
-    local slots = {}
-        slots[1] = 0
-        slots[2] = 0
-        slots[3] = 0
-        slots[4] = 0
-        slots[5] = 0
-        slots[6] = 0
-        slots[7] = 0
-        slots[7] = 0
-        slots[8] = 0
-        slots[9] = 0
-        slots[10] = 0
-        slots[11] = 0
-        slots[12] = 0
-        slots[13] = 0
-        slots[14] = 0
-        slots[15] = 0
-
-    local map = {}
-        map[1] = 0
-        map[2] = 0
-        map[3] = 0
-        map[4] = 0
-        map[5] = 0
-        map[6] = 0
-        map[7] = 0
-        map[7] = 0
-        map[8] = 0
-        map[9] = 0
-        map[10] = 0
-        map[11] = 0
-        map[12] = 0
-        map[13] = 0
-        map[14] = 0
-        map[15] = 0
-
-    local con = true
-    local ci = currentI
-    local ti = table.maxn(plan)
-    local cSlot = 0
-    local dSlot = 0
-    local dType = 0
-    
-    while con == true do
-        cSlot = 1
-        dSlot = 0
-        dType = plan[ci].b
-        while cSlot < 16 and dSlot == 0 do
-            if map[cSlot] == 0 or ( map[cSlot] == dType and slots[cSlot] < 64 ) then
-                dSlot = cSlot
+function pickupMatsForMatplan(matplan)
+    local i
+    local j
+    for i=1,15 do
+        if matplan.blocks[i] > 0 then
+            bot:moveTo(boxes[matplan.blocks[i].x],boxes[matplan.blocks[i].y],boxes[matplan.blocks[i].z]+1)
+            turtle.select(i)
+            while turtle.suckDown() == false and turtle.getItemCount(i) < matplan.counts[i] do
+                print("Please refill crate and press enter.")
+                read()
             end
-            cSlot = cSlot + 1
-        end
-        if dSlot == 0 then
-            con = false
-        else 
-            map[dSlot] = dType
-            slots[dSlot] = slots[dSlot] + 1
-        end
-
-        if ci == ti then con = false end
-        ci = ci + 1
-    end
-
-
-    local returnX = bot:getX()
-    local returnY = bot:getY()
-    local returnZ = bot:getZ()
-    local returnD = bot:getD()
-    
-    for ai = 1, 15 do
-        if map[ai] > 0 then
-            refillTo(map[ai],i,slots[ai])
-            if ai < 15 and turtle.getItemCount(ai+1) > 0 then
-                turtle.select(ai+1)
-                turtle.dropDown()
+            if turtle.getItemCount(i) > matplan.counts[i] then
+                turtle.dropDown(turtle.getItemCount(i) - matplan.counts[i])
+            end
+            if i < 15 and turtle.getItemCount(i+1) > 0 then
+                turtle.select(i + 1)
+                turtle.dropDown(turtle.getItemCount(i+1))
             end
         end
     end
-
-    bot:moveToReverse(returnX,returnY,returnZ)
-
-    local r = {}
-    r.slots=slots
-    r.map=map
-    r.maxI=ci
-    return r
 end
 
-function refillTo(box,slot,count)
-    local box = boxes[item]
+function buildMatPlan(plan,i)
+    local matplan = {}
+    matplan.blocks = {}
+    matplan.counts = {}
+    matplan.blocks[1] = 0
+    matplan.blocks[2] = 0
+    matplan.blocks[3] = 0
+    matplan.blocks[4] = 0
+    matplan.blocks[5] = 0
+    matplan.blocks[6] = 0
+    matplan.blocks[7] = 0
+    matplan.blocks[8] = 0
+    matplan.blocks[9] = 0
+    matplan.blocks[10] = 0
+    matplan.blocks[11] = 0
+    matplan.blocks[12] = 0
+    matplan.blocks[13] = 0
+    matplan.blocks[14] = 0
+    matplan.blocks[15] = 0
+    matplan.counts[1] = 0
+    matplan.counts[2] = 0
+    matplan.counts[3] = 0
+    matplan.counts[4] = 0
+    matplan.counts[5] = 0
+    matplan.counts[6] = 0
+    matplan.counts[7] = 0
+    matplan.counts[8] = 0
+    matplan.counts[9] = 0
+    matplan.counts[10] = 0
+    matplan.counts[11] = 0
+    matplan.counts[12] = 0
+    matplan.counts[13] = 0
+    matplan.counts[14] = 0
+    matplan.counts[15] = 0
 
-    bot:moveTo(box.x,box.y,box.z+1)
-    turtle.select(slot)
-    while turtle.getItemCount(slot) < count do
-        while turtle.suckDown() == false do
-            print("Please refill crate " .. item .. " and press enter.")
-            read()
+    local nextblock
+
+    local continue = true
+    local dslot
+    local o
+    while continue == true do
+        nextblock = plan[i].b
+        dslot = 0
+        o = 1
+        while dslot = 0 and o <= 15 do
+            if matplan.blocks[o] == 0 or ( matplan.blocks[o] == nextblock and matplan.counts[o] < 64 ) then
+                matplan.blocks[o] == nextblock
+                dslot = o
+            end
+        end
+        if dslot > 0 then
+            matplan.counts[dslot] = matplan.counts[dslot] + 1
+            i = i + 1
+        else
+            continue = false
         end
     end
 
-    if turtle.getItemCount(slot) > count then
-        turtle.dropDown(turtle.getItemCount(slot) - count)
+    return matplan
+end
+
+function getSlotForTypeFromMatplan(b,matplan)
+    local i = 1
+    local s = 0
+    for while i <= 15 and s == 0 do
+        if matplan.blocks[i] == b and matplan.counts[i] > 0 then
+            s = i
+        end
+        i = i + 1
     end
+    return s
+end
+
+function runPlan(plan)
+    local i
+    local cx
+    local cy
+    local cz
+    local cb
+    local cs
+    local matplan = buildMatPlan(plan,0)
+    pickupMatsForMatplan(matplan)
+    for i=0,table.maxn(plan) do
+         cx = plan[i].x
+         cy = plan[i].y
+         cz = plan[i].z
+         cb = plan[i].b
+         
+         cs = getSlotForTypeFromMatplan(cb,matplan)
+         if cs == 0 then
+            buildMatPlan(plan,i)
+            pickupMatsForMatplan(matplan)
+            cs = getSlotForTypeFromMatplan(cb,matplan)
+        end
+
+        matplan.counts[cs] = matplan.counts[cs] - 1
+
+        turtle.select(cs)
+        bot:moveTo(cx,cy,cz+1)
+        turtle.placeDown()
+    end
+end
+
+function buildPlan(template)
+    local plan = {}
+    local commands
+    local x
+    local y
+    local z
+    local b
+    local i = 0
+
+    local f = fs.open(template, "r")
+    local line = f.readLine()
+
+    while line ~= nil do
+        commands = split(line," ")
+        x = commands[0]
+        y = commands[1]
+        z = commands[2]
+        b = commands[3]
+        plan[i] = {}
+        plan[i].x = x
+        plan[i].y = y
+        plan[i].z = z
+        plan[i].b = b
+        i = i + 1
+        line = f.readLine()
+    end
+    return plan
+end
+
+function writeAt(string, columnVar, rowVar)
+    term.setCursorPos( columnVar, rowVar )
+    write(string)
+end
+
+function clearScreen()
+    term.clear()
+    writeAt("Build",5,1)
+    term.setCursorPos( 1, 3 )
+end
+
+function askString(question)
+    local ans
+    local cont = true
+    clearScreen()
+    while cont == true do -- Width Question
+        print(question)
+        ans = read()
+        clearScreen()
+        if ans == nil then
+            print( "Please answer with something" )
+        else
+            cont = false
+        end
+    end
+    return ans
+end
+
+function main()
+    local plan = buildPlan(template)
+    runPlan(plan)
+
+    bot:moveTo(homeLocation.x,homeLocation.y,homeLocation.z)
+end
+
+homeLocation = { x = 1, y = 0, z = 1 }
+boxes = {}
+boxes[1] = { x = 1, y = 0, z = 0 }
+boxes[2] = { x = 3, y = 0, z = 0 }
+boxes[3] = { x = 5, y = 0, z = 0 }
+boxes[4] = { x = 1, y = -2, z = 0 }
+boxes[5] = { x = 3, y = -2, z = 0 }
+boxes[6] = { x = 5, y = -2, z = 0 }
+boxes[7] = { x = 1, y = -4, z = 0 }
+boxes[8] = { x = 3, y = -4, z = 0 }
+boxes[9] = { x = 5, y = -4, z = 0 }
+
+
+template = askString("Template?")
+
+global_ticker = 0
+
+if fs.exists("rom/build/"..template) then
+    template = "rom/build/"..template
+elseif fs.exists(template) == false then
+    download(template)
+end
+
+if fs.exists(template) then
+    bot = TGM.init(homeLocation.x,homeLocation.y,homeLocation.z,0)
+    main()
+else
+    clearScreen()
+    print("Template could not be found. Exiting")
 end
